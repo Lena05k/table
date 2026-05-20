@@ -1,0 +1,97 @@
+import { ref, watch, onMounted } from 'vue'
+import type { DoPageConfig, TabView, SortDirection } from '../config/types'
+import { usePagination } from './usePagination'
+import { useDocumentFilters } from './useDocumentFilters'
+import { useDocumentTable } from './useDocumentTable'
+import { fetchDocuments } from '@/api/documents.api'
+
+export function useDocumentPage(config: DoPageConfig) {
+  const activeTab = ref<TabView>(config.availableTabs[0])
+  const rows = ref<Record<string, unknown>[]>([])
+  const loading = ref(false)
+  const sortField = ref<string | undefined>(config.defaultSort?.field)
+  const sortDirection = ref<SortDirection | undefined>(config.defaultSort?.direction)
+
+  const pagination = usePagination(
+    config.pagination.defaultPageSize,
+    config.pagination.pageSizeOptions,
+  )
+  const filters = useDocumentFilters(config.filters)
+  const table = useDocumentTable()
+
+  async function load(): Promise<void> {
+    loading.value = true
+    try {
+      const result = await fetchDocuments({
+        doId: config.id,
+        page: pagination.page.value,
+        pageSize: pagination.pageSize.value,
+        sortField: sortField.value,
+        sortDirection: sortDirection.value,
+        filters: filters.toQueryParams(),
+      })
+      rows.value = result.items
+      pagination.setTotal(result.total)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  function onSortChanged(sortModel: { colId: string; sort: string }[]): void {
+    if (sortModel.length === 0) {
+      sortField.value = undefined
+      sortDirection.value = undefined
+    } else {
+      sortField.value = sortModel[0].colId
+      sortDirection.value = sortModel[0].sort as SortDirection
+    }
+    pagination.reset()
+    load()
+  }
+
+  function onFiltersApplied(): void {
+    pagination.reset()
+    load()
+  }
+
+  function onPageChange(): void {
+    load()
+  }
+
+  function onPageSizeChange(): void {
+    load()
+  }
+
+  function setTab(tab: TabView): void {
+    activeTab.value = tab
+  }
+
+  watch(
+    () => pagination.page.value,
+    () => onPageChange(),
+  )
+
+  watch(
+    () => pagination.pageSize.value,
+    () => onPageSizeChange(),
+  )
+
+  onMounted(() => {
+    load()
+  })
+
+  return {
+    activeTab,
+    rows,
+    loading,
+    sortField,
+    sortDirection,
+    pagination,
+    filters,
+    table,
+    load,
+    onSortChanged,
+    onFiltersApplied,
+    setTab,
+  }
+}
