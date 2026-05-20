@@ -94,7 +94,7 @@ function onColumnStateChanged(): void {
 </script>
 
 <template>
-  <div class="relative w-full">
+  <div class="relative w-full h-full">
     <div
       v-if="loading"
       class="absolute inset-0 z-10 flex items-center justify-center bg-white/60"
@@ -104,8 +104,7 @@ function onColumnStateChanged(): void {
 
     <AgGridVue
       theme="legacy"
-      class="ag-theme-alpine w-full"
-      style="min-height: 400px;"
+      class="ag-theme-alpine w-full h-full"
       :columnDefs="allColumnDefs"
       :rowData="rowData"
       :defaultColDef="defaultColDef"
@@ -113,7 +112,6 @@ function onColumnStateChanged(): void {
       :rowSelection="rowSelection"
       :context="gridContext"
       :suppressPaginationPanel="true"
-      :domLayout="'autoHeight'"
       @grid-ready="onGridReady"
       @sort-changed="onSortChanged"
       @row-clicked="(e: RowClickedEvent<Record<string, unknown>>) => e.data && emit('row-clicked', e.data)"

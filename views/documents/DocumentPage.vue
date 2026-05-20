@@ -72,8 +72,8 @@ function onDelete(_data: Record<string, unknown>): void {
     Неизвестный тип ДО: <code class="ml-2 font-mono text-red-500">{{ configId }}</code>
   </div>
 
-  <div v-else class="min-h-screen bg-gray-100">
-    <div class="max-w-[1700px] mx-auto bg-white shadow-sm flex flex-col min-h-screen text-gray-900">
+  <div v-else class="h-screen overflow-hidden bg-gray-100 flex justify-center">
+    <div class="w-full max-w-[1700px] h-full bg-white shadow-sm flex flex-col text-gray-900">
       <!-- Title + global search -->
       <DocumentHeader
         :title="config.title"
@@ -90,7 +90,7 @@ function onDelete(_data: Record<string, unknown>): void {
       />
 
       <!-- Single action+filter row: [Create][Export][Import][★][↻][...] ··· [Filters][Date][Role][Configure] -->
-      <div class="flex items-center justify-between px-5 py-2.5 gap-4 border-b border-gray-200 bg-white">
+      <div class="flex items-center justify-between px-5 py-2.5 gap-4 border-b border-gray-200 bg-white shrink-0">
         <DocumentToolbar
           :actions="config.toolbar"
           @action="onToolbarAction"
@@ -115,7 +115,7 @@ function onDelete(_data: Record<string, unknown>): void {
       <!-- Pagination hint message when on first page with many results -->
       <div
         v-if="pagination.page.value === 1 && pagination.total.value > pagination.pageSize.value"
-        class="px-5 py-2 text-xs text-gray-500 bg-blue-50 border-b border-blue-100"
+        class="px-5 py-2 text-xs text-gray-500 bg-blue-50 border-b border-blue-100 shrink-0"
       >
         Показаны первые {{ pagination.pageSize.value }} документов. Чтобы сократить выборку, воспользуйтесь поиском.
       </div>
@@ -123,14 +123,14 @@ function onDelete(_data: Record<string, unknown>): void {
       <!-- Kanban placeholder -->
       <div
         v-if="activeTab === 'kanban'"
-        class="flex-1 flex items-center justify-center text-gray-400 text-sm py-20"
+        class="flex-1 flex items-center justify-center text-gray-400 text-sm"
       >
         Канбан-вид в разработке
       </div>
 
-      <!-- AG-Grid table -->
+      <!-- AG-Grid table — flex-1 min-h-0 so it fills remaining space and scrolls internally -->
       <template v-if="activeTab === 'table'">
-        <div class="flex-1 overflow-hidden">
+        <div class="flex-1 min-h-0 overflow-hidden">
           <DocumentTable
             :column-defs="config.columns"
             :row-data="rows"
