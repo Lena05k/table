@@ -43,6 +43,16 @@ function onToolbarAction(key: string): void {
   if (key === 'export') { table.exportToCsv(); return }
 }
 
+let _searchTimer: ReturnType<typeof setTimeout>
+function onSearch(query: string): void {
+  clearTimeout(_searchTimer)
+  filters.setFilter('_search', query)
+  _searchTimer = setTimeout(() => {
+    pagination.reset()
+    load()
+  }, 300)
+}
+
 function onRowClicked(data: Record<string, unknown>): void {
   const code = data['code']
   if (code !== undefined) {
@@ -77,7 +87,7 @@ function onDelete(_data: Record<string, unknown>): void {
       <!-- Title + global search -->
       <DocumentHeader
         :title="config.title"
-        @search="(q) => filters.setFilter('_search', q)"
+        @search="onSearch"
         @favorite="() => {}"
       />
 

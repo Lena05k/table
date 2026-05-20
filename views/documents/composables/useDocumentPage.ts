@@ -21,10 +21,16 @@ export function useDocumentPage(config: DoPageConfig) {
   const table = useDocumentTable(config.id)
 
   function _sliceMock(): void {
-    const mock = (mockData as Record<string, Record<string, unknown>[]>)[config.id] ?? []
+    const all = (mockData as Record<string, Record<string, unknown>[]>)[config.id] ?? []
+    const query = ((filters.activeFilters.value['_search'] as string) ?? '').trim().toLowerCase()
+    const filtered = query
+      ? all.filter((row) =>
+          Object.values(row).some((v) => String(v ?? '').toLowerCase().includes(query)),
+        )
+      : all
     const start = (pagination.page.value - 1) * pagination.pageSize.value
-    rows.value = mock.slice(start, start + pagination.pageSize.value)
-    pagination.setTotal(mock.length)
+    rows.value = filtered.slice(start, start + pagination.pageSize.value)
+    pagination.setTotal(filtered.length)
   }
 
   async function load(): Promise<void> {
