@@ -4,6 +4,7 @@ import { usePagination } from './usePagination'
 import { useDocumentFilters } from './useDocumentFilters'
 import { useDocumentTable } from './useDocumentTable'
 import { fetchDocuments } from '@/api/documents.api'
+import { mockData } from '../config/mockData'
 
 export function useDocumentPage(config: DoPageConfig) {
   const activeTab = ref<TabView>(config.availableTabs[0])
@@ -32,6 +33,11 @@ export function useDocumentPage(config: DoPageConfig) {
       })
       rows.value = result.items
       pagination.setTotal(result.total)
+    } catch {
+      const mock = mockData[config.id] ?? []
+      const start = (pagination.page.value - 1) * pagination.pageSize.value
+      rows.value = mock.slice(start, start + pagination.pageSize.value)
+      pagination.setTotal(mock.length)
     } finally {
       loading.value = false
     }

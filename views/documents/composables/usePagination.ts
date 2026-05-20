@@ -9,9 +9,12 @@ export function usePagination(defaultPageSize: number, pageSizeOptions: number[]
     total.value === 0 ? 1 : Math.ceil(total.value / pageSize.value),
   )
 
-  const pageLabel = computed(
-    () => `${(page.value - 1) * pageSize.value + 1}–${Math.min(page.value * pageSize.value, total.value)} из ${total.value}`,
-  )
+  const pageLabel = computed(() => {
+    if (total.value === 0) return '0 из 0'
+    const from = (page.value - 1) * pageSize.value + 1
+    const to = Math.min(page.value * pageSize.value, total.value)
+    return `${from}–${to} из ${total.value}`
+  })
 
   const canGoPrev = computed(() => page.value > 1)
   const canGoNext = computed(() => page.value < pageCount.value)

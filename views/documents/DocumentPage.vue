@@ -72,19 +72,19 @@ function onRowClicked(data: Record<string, unknown>): void {
       @download="table.exportToCsv()"
     />
 
-    <!-- Toolbar: create, export, import, refresh, more + configure columns -->
-    <DocumentToolbar
-      :actions="config.toolbar"
-      @action="onToolbarAction"
-      @configure-columns="table.openColumnPanel()"
-    />
-
-    <!-- Filter bar: active filters badge, date range, role selector -->
-    <DocumentFilterBar
-      :filters-state="filters"
-      @apply="onFiltersApplied"
-      @open-filter-panel="() => {}"
-    />
+    <!-- Single action+filter row: [Create][Export][Import][★][↻][...] ··· [Filters][Date][Role][Configure] -->
+    <div class="flex items-center justify-between px-5 py-2.5 gap-4 border-b border-gray-200 bg-white">
+      <DocumentToolbar
+        :actions="config.toolbar"
+        @action="onToolbarAction"
+      />
+      <DocumentFilterBar
+        :filters-state="filters"
+        @apply="onFiltersApplied"
+        @open-filter-panel="() => {}"
+        @configure-columns="table.openColumnPanel()"
+      />
+    </div>
 
     <!-- Optional stats row: operations dropdown + stage counts + special blocks -->
     <DocumentStatsRow
