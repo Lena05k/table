@@ -8,6 +8,7 @@ import type {
   GridReadyEvent,
   SortChangedEvent,
   RowClassParams,
+  RowClickedEvent,
 } from 'ag-grid-community'
 import RadioCellRenderer from './RadioCellRenderer.vue'
 
@@ -15,11 +16,13 @@ interface Props {
   columnDefs: (ColDef | ColGroupDef)[]
   rowData: Record<string, unknown>[]
   loading?: boolean
+  selectionMode?: boolean
   rowClassRules?: Record<string, (params: RowClassParams<Record<string, unknown>>) => boolean>
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
+  selectionMode: false,
   rowClassRules: () => ({}),
 })
 
@@ -28,9 +31,20 @@ const emit = defineEmits<{
   (e: 'sort-changed', sortModel: { colId: string; sort: string }[]): void
   (e: 'row-clicked', data: Record<string, unknown>): void
   (e: 'column-state-changed'): void
+  (e: 'view', data: Record<string, unknown>): void
+  (e: 'enable-select', data: Record<string, unknown>): void
+  (e: 'edit', data: Record<string, unknown>): void
+  (e: 'delete', data: Record<string, unknown>): void
 }>()
 
-// Radio selection column prepended to every table
+const gridContext = computed(() => ({
+  onView: (data: Record<string, unknown>) => emit('view', data),
+  onEnableSelect: (data: Record<string, unknown>) => emit('enable-select', data),
+  onEdit: (data: Record<string, unknown>) => emit('edit', data),
+  onDelete: (data: Record<string, unknown>) => emit('delete', data),
+}))
+
+// Radio selection column — only shown when selectionMode is active
 const RADIO_COL: ColDef = {
   colId: 'row-select',
   headerName: '',
@@ -46,10 +60,9 @@ const RADIO_COL: ColDef = {
   cellRenderer: RadioCellRenderer,
 }
 
-const allColumnDefs = computed<(ColDef | ColGroupDef)[]>(() => [
-  RADIO_COL,
-  ...props.columnDefs,
-])
+const allColumnDefs = computed<(ColDef | ColGroupDef)[]>(() =>
+  props.selectionMode ? [RADIO_COL, ...props.columnDefs] : [...props.columnDefs],
+)
 
 // Default col def: menu enabled so users can right-click → Pin Column
 const defaultColDef: ColDef = {
@@ -61,7 +74,7 @@ const defaultColDef: ColDef = {
   menuTabs: ['generalMenuTab'],
 }
 
-const rowSelection = { mode: 'singleRow', checkboxes: false, enableClickSelection: true }
+const rowSelection = { mode: 'singleRow' as const, checkboxes: false, enableClickSelection: true }
 
 function onGridReady(params: GridReadyEvent): void {
   emit('grid-ready', params.api)
@@ -98,11 +111,12 @@ function onColumnStateChanged(): void {
       :defaultColDef="defaultColDef"
       :rowClassRules="rowClassRules"
       :rowSelection="rowSelection"
+      :context="gridContext"
       :suppressPaginationPanel="true"
       :domLayout="'autoHeight'"
       @grid-ready="onGridReady"
       @sort-changed="onSortChanged"
-      @row-clicked="(e) => e.data && emit('row-clicked', e.data)"
+      @row-clicked="(e: RowClickedEvent<Record<string, unknown>>) => e.data && emit('row-clicked', e.data)"
       @column-moved="onColumnStateChanged"
       @column-pinned="onColumnStateChanged"
       @column-visible="onColumnStateChanged"

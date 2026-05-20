@@ -4,6 +4,7 @@ import type { GridApi, ColumnState } from 'ag-grid-community'
 export function useDocumentTable(doId: string) {
   const gridApi = ref<GridApi | null>(null)
   const columnPanelOpen = ref(false)
+  const selectionMode = ref(false)
   const storageKey = `col-state-${doId}`
 
   function onGridReady(api: GridApi): void {
@@ -71,9 +72,19 @@ export function useDocumentTable(doId: string) {
     columnPanelOpen.value = false
   }
 
+  function enableSelection(): void {
+    selectionMode.value = true
+  }
+
+  function disableSelection(): void {
+    selectionMode.value = false
+    gridApi.value?.deselectAll()
+  }
+
   return {
     gridApi,
     columnPanelOpen,
+    selectionMode,
     onGridReady,
     saveColumnState,
     resetColumnState,
@@ -85,6 +96,8 @@ export function useDocumentTable(doId: string) {
     refreshCells,
     openColumnPanel,
     closeColumnPanel,
+    enableSelection,
+    disableSelection,
   }
 }
 
