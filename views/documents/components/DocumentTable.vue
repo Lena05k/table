@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
 import type {
   ColDef,
@@ -60,6 +59,7 @@ function onSortChanged(event: SortChangedEvent): void {
     </div>
 
     <AgGridVue
+      theme="legacy"
       class="ag-theme-alpine w-full"
       style="min-height: 400px;"
       :columnDefs="columnDefs"
@@ -67,10 +67,8 @@ function onSortChanged(event: SortChangedEvent): void {
       :defaultColDef="defaultColDef"
       :rowClassRules="rowClassRules"
       :rowSelection="'multiple'"
-      :animateRows="true"
       :suppressPaginationPanel="true"
       :domLayout="'autoHeight'"
-      :suppressNoRowsOverlay="false"
       @grid-ready="onGridReady"
       @sort-changed="onSortChanged"
       @row-clicked="(e) => e.data && emit('row-clicked', e.data)"
