@@ -122,6 +122,7 @@ function onRowClicked(data: Record<string, unknown>): void {
           @grid-ready="table.onGridReady"
           @sort-changed="onSortChanged"
           @row-clicked="onRowClicked"
+          @column-state-changed="table.saveColumnState()"
         />
       </div>
 

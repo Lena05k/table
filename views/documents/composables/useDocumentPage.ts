@@ -18,11 +18,22 @@ export function useDocumentPage(config: DoPageConfig) {
     config.pagination.pageSizeOptions,
   )
   const filters = useDocumentFilters(config.filters)
-  const table = useDocumentTable()
+  const table = useDocumentTable(config.id)
+
+  function _sliceMock(): void {
+    const mock = (mockData as Record<string, Record<string, unknown>[]>)[config.id] ?? []
+    const start = (pagination.page.value - 1) * pagination.pageSize.value
+    rows.value = mock.slice(start, start + pagination.pageSize.value)
+    pagination.setTotal(mock.length)
+  }
 
   async function load(): Promise<void> {
     loading.value = true
     try {
+      if (import.meta.env.DEV) {
+        _sliceMock()
+        return
+      }
       const result = await fetchDocuments({
         doId: config.id,
         page: pagination.page.value,
@@ -31,13 +42,11 @@ export function useDocumentPage(config: DoPageConfig) {
         sortDirection: sortDirection.value,
         filters: filters.toQueryParams(),
       })
+      if (!Array.isArray(result?.items)) throw new Error('invalid response')
       rows.value = result.items
-      pagination.setTotal(result.total)
+      pagination.setTotal(result.total ?? 0)
     } catch {
-      const mock = mockData[config.id] ?? []
-      const start = (pagination.page.value - 1) * pagination.pageSize.value
-      rows.value = mock.slice(start, start + pagination.pageSize.value)
-      pagination.setTotal(mock.length)
+      _sliceMock()
     } finally {
       loading.value = false
     }
