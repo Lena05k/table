@@ -1,13 +1,3 @@
-<script setup lang="ts">
-const emit = defineEmits<{
-  (e: 'work-with-lists'): void
-  (e: 'work-with-return'): void
-  (e: 'send-xml'): void
-  (e: 'print-outgoing'): void
-  (e: 'ops-directory'): void
-}>()
-</script>
-
 <template>
   <div class="flex flex-wrap items-center gap-2">
     <button
@@ -46,3 +36,13 @@ const emit = defineEmits<{
     </button>
   </div>
 </template>
+
+<script setup lang="ts">
+const emit = defineEmits<{
+  (e: 'work-with-lists'): void
+  (e: 'work-with-return'): void
+  (e: 'send-xml'): void
+  (e: 'print-outgoing'): void
+  (e: 'ops-directory'): void
+}>()
+</script>

@@ -1,3 +1,33 @@
+<template>
+  <div class="relative w-full h-full">
+    <div
+        v-if="loading"
+        class="absolute inset-0 z-10 flex items-center justify-center bg-white/60"
+    >
+      <div class="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+
+    <AgGridVue
+        theme="legacy"
+        class="ag-theme-alpine w-full h-full"
+        :columnDefs="allColumnDefs"
+        :rowData="rowData"
+        :defaultColDef="defaultColDef"
+        :rowClassRules="rowClassRules"
+        :rowSelection="rowSelection"
+        :context="gridContext"
+        :suppressPaginationPanel="true"
+        @grid-ready="onGridReady"
+        @sort-changed="onSortChanged"
+        @row-clicked="(e: RowClickedEvent<Record<string, unknown>>) => e.data && emit('row-clicked', e.data)"
+        @column-moved="onColumnStateChanged"
+        @column-pinned="onColumnStateChanged"
+        @column-visible="onColumnStateChanged"
+        @drag-stopped="onColumnStateChanged"
+    />
+  </div>
+</template>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
@@ -92,33 +122,3 @@ function onColumnStateChanged(): void {
   emit('column-state-changed')
 }
 </script>
-
-<template>
-  <div class="relative w-full h-full">
-    <div
-      v-if="loading"
-      class="absolute inset-0 z-10 flex items-center justify-center bg-white/60"
-    >
-      <div class="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-
-    <AgGridVue
-      theme="legacy"
-      class="ag-theme-alpine w-full h-full"
-      :columnDefs="allColumnDefs"
-      :rowData="rowData"
-      :defaultColDef="defaultColDef"
-      :rowClassRules="rowClassRules"
-      :rowSelection="rowSelection"
-      :context="gridContext"
-      :suppressPaginationPanel="true"
-      @grid-ready="onGridReady"
-      @sort-changed="onSortChanged"
-      @row-clicked="(e: RowClickedEvent<Record<string, unknown>>) => e.data && emit('row-clicked', e.data)"
-      @column-moved="onColumnStateChanged"
-      @column-pinned="onColumnStateChanged"
-      @column-visible="onColumnStateChanged"
-      @drag-stopped="onColumnStateChanged"
-    />
-  </div>
-</template>

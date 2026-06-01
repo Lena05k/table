@@ -1,22 +1,3 @@
-<script setup lang="ts">
-import type { DocumentFiltersState } from '../composables/useDocumentFilters'
-
-interface Props {
-  filtersState: DocumentFiltersState
-}
-defineProps<Props>()
-
-const emit = defineEmits<{
-  (e: 'apply'): void
-  (e: 'open-filter-panel'): void
-  (e: 'configure-columns'): void
-}>()
-
-const ROLE_OPTIONS = [
-  { label: 'Все', value: 'all' },
-]
-</script>
-
 <template>
   <div class="flex items-center gap-3">
     <!-- Filters badge button -->
@@ -89,3 +70,22 @@ const ROLE_OPTIONS = [
     </button>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { DocumentFiltersState } from '../composables/useDocumentFilters'
+
+interface Props {
+  filtersState: DocumentFiltersState
+}
+defineProps<Props>()
+
+const emit = defineEmits<{
+  (e: 'apply'): void
+  (e: 'open-filter-panel'): void
+  (e: 'configure-columns'): void
+}>()
+
+const ROLE_OPTIONS = [
+  { label: 'Все', value: 'all' },
+]
+</script>

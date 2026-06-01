@@ -1,23 +1,3 @@
-<script setup lang="ts">
-import type { TabView } from '../config/types'
-
-interface Props {
-  tabs: TabView[]
-  activeTab: TabView
-}
-defineProps<Props>()
-
-const emit = defineEmits<{
-  (e: 'change', tab: TabView): void
-  (e: 'download'): void
-}>()
-
-const TAB_LABELS: Record<TabView, string> = {
-  table: 'Таблица',
-  kanban: 'Канбан',
-}
-</script>
-
 <template>
   <div class="flex items-center justify-between px-5 border-b border-gray-200">
     <div class="flex">
@@ -47,3 +27,23 @@ const TAB_LABELS: Record<TabView, string> = {
     </button>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { TabView } from '../config/types'
+
+interface Props {
+  tabs: TabView[]
+  activeTab: TabView
+}
+defineProps<Props>()
+
+const emit = defineEmits<{
+  (e: 'change', tab: TabView): void
+  (e: 'download'): void
+}>()
+
+const TAB_LABELS: Record<TabView, string> = {
+  table: 'Таблица',
+  kanban: 'Канбан',
+}
+</script>

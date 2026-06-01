@@ -1,141 +1,3 @@
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import { AgGridVue } from 'ag-grid-vue3'
-import type { ColDef, GridApi, GridReadyEvent, RowClickedEvent } from 'ag-grid-community'
-import type { FieldDef, DataCell } from './types/widget'
-
-// ─── Пропы (все строки, т.к. приходят из HTML-атрибутов) ─────────────────────
-
-interface Props {
-  /** JSON: Record<sysName, FieldDef> — передать как {{ fieldAlias|json_encode }} */
-  columnsJson: string
-  /** JSON: DataCell[][] — передать как {{ dataTable|json_encode }} */
-  rowsJson: string
-  /**
-   * JSON: string[] — ID документов в том же порядке что и строки.
-   * Если не передан — используется значение первой колонки.
-   * Пример Smarty: {$docIds|json_encode} где $docIds = array_column($rows, 'ID')
-   */
-  docIdsJson?: string
-  /** progectId для ссылок на документ */
-  classId?: string
-  /** parentDocumentId — если таблица внутри документа (откроет popup) */
-  parentDocumentId?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  docIdsJson: '[]',
-  classId: '',
-  parentDocumentId: '',
-})
-
-// ─── Парсинг JSON ─────────────────────────────────────────────────────────────
-
-function safeJson<T>(json: string, fallback: T): T {
-  try { return JSON.parse(json) } catch { return fallback }
-}
-
-const fieldAlias = computed<Record<string, FieldDef>>(() =>
-  safeJson(props.columnsJson, {}),
-)
-
-const rawRows = computed<DataCell[][]>(() =>
-  safeJson(props.rowsJson, []),
-)
-
-const docIds = computed<string[]>(() =>
-  safeJson(props.docIdsJson ?? '[]', []),
-)
-
-// ─── Преобразование строк ─────────────────────────────────────────────────────
-
-const allRowData = computed<Record<string, unknown>[]>(() =>
-  rawRows.value.map((cells, rowIdx) => {
-    const row: Record<string, unknown> = {}
-    let firstCellValue: string | null = null
-
-    for (const cell of cells) {
-      if (!cell?.sys_name) continue
-      const display = cell.value_title ?? cell.value ?? ''
-      row[cell.sys_name] = display
-      if (firstCellValue === null) firstCellValue = String(cell.value ?? '')
-    }
-
-    // ID документа: из явного массива docIds, иначе значение первой ячейки
-    row['_docId'] = docIds.value[rowIdx] ?? firstCellValue ?? ''
-    return row
-  }),
-)
-
-// ─── Поиск ───────────────────────────────────────────────────────────────────
-
-const searchQuery = ref('')
-let _searchTimer: ReturnType<typeof setTimeout>
-
-const rowData = computed<Record<string, unknown>[]>(() => {
-  const q = searchQuery.value.trim().toLowerCase()
-  if (!q) return allRowData.value
-  return allRowData.value.filter((row) =>
-    Object.entries(row)
-      .filter(([k]) => !k.startsWith('_'))
-      .some(([, v]) => String(v ?? '').toLowerCase().includes(q)),
-  )
-})
-
-function onSearchInput(e: Event): void {
-  clearTimeout(_searchTimer)
-  const val = (e.target as HTMLInputElement).value
-  _searchTimer = setTimeout(() => { searchQuery.value = val }, 250)
-}
-
-// ─── AG-Grid ──────────────────────────────────────────────────────────────────
-
-const gridApi = ref<GridApi | null>(null)
-
-const colDefs = computed<ColDef[]>(() =>
-  Object.entries(fieldAlias.value).map(([sysName, field]) => ({
-    colId: sysName,
-    field: sysName,
-    headerName: field[0],
-    sortable: field.CAN_SORTING,
-    resizable: true,
-    minWidth: 80,
-    suppressHeaderMenuButton: !field.CAN_SORTING,
-  })),
-)
-
-const defaultColDef: ColDef = {
-  resizable: true,
-  sortable: false,
-  filter: false,
-  minWidth: 80,
-}
-
-function onGridReady(params: GridReadyEvent): void {
-  gridApi.value = params.api
-}
-
-// ─── Навигация по клику на строку ─────────────────────────────────────────────
-
-function onRowClicked(e: RowClickedEvent<Record<string, unknown>>): void {
-  if (!e.data) return
-  const docId = e.data['_docId']
-  if (!docId || !props.classId) return
-
-  if (props.parentDocumentId) {
-    const url = `/documents/?progectId=${props.classId}&parentDocumentId=${props.parentDocumentId}&documentId=${docId}`
-    const openWindow = (window as unknown as Record<string, unknown>)['openWindow']
-    if (typeof openWindow === 'function') {
-      ;(openWindow as (u: string, w: number, h: number) => void)(url, 1100, 710)
-    } else {
-      window.open(url, '_blank', 'width=1100,height=710')
-    }
-  } else {
-    window.location.href = `?progectId=${props.classId}&documentId=${docId}`
-  }
-}
-</script>
-
 <template>
   <div class="vdw">
     <!-- ── Поиск + счётчик ─────────────────────────────────────────── -->
@@ -180,6 +42,144 @@ function onRowClicked(e: RowClickedEvent<Record<string, unknown>>): void {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { AgGridVue } from 'ag-grid-vue3'
+import type { ColDef, GridApi, GridReadyEvent, RowClickedEvent } from 'ag-grid-community'
+import type { FieldDef, DataCell } from './types/widget'
+
+// ─── Пропы (все строки, т.к. приходят из HTML-атрибутов) ─────────────────────
+
+interface Props {
+  /** JSON: Record<sysName, FieldDef> — передать как {{ fieldAlias|json_encode }} */
+  columnsJson: string
+  /** JSON: DataCell[][] — передать как {{ dataTable|json_encode }} */
+  rowsJson: string
+  /**
+   * JSON: string[] — ID документов в том же порядке что и строки.
+   * Если не передан — используется значение первой колонки.
+   * Пример Smarty: {$docIds|json_encode} где $docIds = array_column($rows, 'ID')
+   */
+  docIdsJson?: string
+  /** progectId для ссылок на документ */
+  classId?: string
+  /** parentDocumentId — если таблица внутри документа (откроет popup) */
+  parentDocumentId?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  docIdsJson: '[]',
+  classId: '',
+  parentDocumentId: '',
+})
+
+// ─── Парсинг JSON ─────────────────────────────────────────────────────────────
+
+function safeJson<T>(json: string, fallback: T): T {
+  try { return JSON.parse(json) } catch { return fallback }
+}
+
+const fieldAlias = computed<Record<string, FieldDef>>(() =>
+    safeJson(props.columnsJson, {}),
+)
+
+const rawRows = computed<DataCell[][]>(() =>
+    safeJson(props.rowsJson, []),
+)
+
+const docIds = computed<string[]>(() =>
+    safeJson(props.docIdsJson ?? '[]', []),
+)
+
+// ─── Преобразование строк ─────────────────────────────────────────────────────
+
+const allRowData = computed<Record<string, unknown>[]>(() =>
+    rawRows.value.map((cells, rowIdx) => {
+      const row: Record<string, unknown> = {}
+      let firstCellValue: string | null = null
+
+      for (const cell of cells) {
+        if (!cell?.sys_name) continue
+        const display = cell.value_title ?? cell.value ?? ''
+        row[cell.sys_name] = display
+        if (firstCellValue === null) firstCellValue = String(cell.value ?? '')
+      }
+
+      // ID документа: из явного массива docIds, иначе значение первой ячейки
+      row['_docId'] = docIds.value[rowIdx] ?? firstCellValue ?? ''
+      return row
+    }),
+)
+
+// ─── Поиск ───────────────────────────────────────────────────────────────────
+
+const searchQuery = ref('')
+let _searchTimer: ReturnType<typeof setTimeout>
+
+const rowData = computed<Record<string, unknown>[]>(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return allRowData.value
+  return allRowData.value.filter((row) =>
+      Object.entries(row)
+          .filter(([k]) => !k.startsWith('_'))
+          .some(([, v]) => String(v ?? '').toLowerCase().includes(q)),
+  )
+})
+
+function onSearchInput(e: Event): void {
+  clearTimeout(_searchTimer)
+  const val = (e.target as HTMLInputElement).value
+  _searchTimer = setTimeout(() => { searchQuery.value = val }, 250)
+}
+
+// ─── AG-Grid ──────────────────────────────────────────────────────────────────
+
+const gridApi = ref<GridApi | null>(null)
+
+const colDefs = computed<ColDef[]>(() =>
+    Object.entries(fieldAlias.value).map(([sysName, field]) => ({
+      colId: sysName,
+      field: sysName,
+      headerName: field[0],
+      sortable: field.CAN_SORTING,
+      resizable: true,
+      minWidth: 80,
+      suppressHeaderMenuButton: !field.CAN_SORTING,
+    })),
+)
+
+const defaultColDef: ColDef = {
+  resizable: true,
+  sortable: false,
+  filter: false,
+  minWidth: 80,
+}
+
+function onGridReady(params: GridReadyEvent): void {
+  gridApi.value = params.api
+}
+
+// ─── Навигация по клику на строку ─────────────────────────────────────────────
+
+function onRowClicked(e: RowClickedEvent<Record<string, unknown>>): void {
+  if (!e.data) return
+  const docId = e.data['_docId']
+  if (!docId || !props.classId) return
+
+  if (props.parentDocumentId) {
+    const url = `/documents/?progectId=${props.classId}&parentDocumentId=${props.parentDocumentId}&documentId=${docId}`
+    const openWindow = (window as unknown as Record<string, unknown>)['openWindow']
+    if (typeof openWindow === 'function') {
+      ;(openWindow as (u: string, w: number, h: number) => void)(url, 1100, 710)
+    } else {
+      window.open(url, '_blank', 'width=1100,height=710')
+    }
+  } else {
+    window.location.href = `?progectId=${props.classId}&documentId=${docId}`
+  }
+}
+</script>
 
 <style>
 /* Не scoped — иначе AG-Grid не видит стили для своих порталов */

@@ -1,54 +1,3 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-import type { ICellRendererParams } from 'ag-grid-community'
-
-interface ActionContext {
-  onView: (data: Record<string, unknown>) => void
-  onEnableSelect: (data: Record<string, unknown>) => void
-  onEdit: (data: Record<string, unknown>) => void
-  onDelete: (data: Record<string, unknown>) => void
-}
-
-type ActionParams = ICellRendererParams<Record<string, unknown>, unknown, ActionContext>
-
-const props = defineProps<{ params: ActionParams }>()
-
-const menuOpen = ref(false)
-const menuStyle = ref({ top: '0px', left: '0px' })
-
-function openMenu(event: MouseEvent): void {
-  const btn = event.currentTarget as HTMLElement
-  const rect = btn.getBoundingClientRect()
-  // open below the button, right-aligned
-  menuStyle.value = {
-    top: `${rect.bottom + 4}px`,
-    left: `${rect.right - 160}px`,
-  }
-  menuOpen.value = true
-}
-
-function handleView(): void {
-  props.params.context?.onView?.(props.params.data ?? {})
-  menuOpen.value = false
-}
-
-function handleSelect(): void {
-  props.params.context?.onEnableSelect?.(props.params.data ?? {})
-  props.params.node.setSelected(true, true)
-  menuOpen.value = false
-}
-
-function handleEdit(): void {
-  props.params.context?.onEdit?.(props.params.data ?? {})
-  menuOpen.value = false
-}
-
-function handleDelete(): void {
-  props.params.context?.onDelete?.(props.params.data ?? {})
-  menuOpen.value = false
-}
-</script>
-
 <template>
   <div class="flex items-center justify-center gap-1 h-full">
     <!-- Eye: open document card -->
@@ -138,6 +87,57 @@ function handleDelete(): void {
     </Transition>
   </Teleport>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { ICellRendererParams } from 'ag-grid-community'
+
+interface ActionContext {
+  onView: (data: Record<string, unknown>) => void
+  onEnableSelect: (data: Record<string, unknown>) => void
+  onEdit: (data: Record<string, unknown>) => void
+  onDelete: (data: Record<string, unknown>) => void
+}
+
+type ActionParams = ICellRendererParams<Record<string, unknown>, unknown, ActionContext>
+
+const props = defineProps<{ params: ActionParams }>()
+
+const menuOpen = ref(false)
+const menuStyle = ref({ top: '0px', left: '0px' })
+
+function openMenu(event: MouseEvent): void {
+  const btn = event.currentTarget as HTMLElement
+  const rect = btn.getBoundingClientRect()
+  // open below the button, right-aligned
+  menuStyle.value = {
+    top: `${rect.bottom + 4}px`,
+    left: `${rect.right - 160}px`,
+  }
+  menuOpen.value = true
+}
+
+function handleView(): void {
+  props.params.context?.onView?.(props.params.data ?? {})
+  menuOpen.value = false
+}
+
+function handleSelect(): void {
+  props.params.context?.onEnableSelect?.(props.params.data ?? {})
+  props.params.node.setSelected(true, true)
+  menuOpen.value = false
+}
+
+function handleEdit(): void {
+  props.params.context?.onEdit?.(props.params.data ?? {})
+  menuOpen.value = false
+}
+
+function handleDelete(): void {
+  props.params.context?.onDelete?.(props.params.data ?? {})
+  menuOpen.value = false
+}
+</script>
 
 <style scoped>
 .menu-drop-enter-active,

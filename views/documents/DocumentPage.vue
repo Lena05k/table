@@ -1,82 +1,3 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { doConfigs } from './config/index'
-import { useDocumentPage } from './composables/useDocumentPage'
-import DocumentHeader from './components/DocumentHeader.vue'
-import DocumentViewTabs from './components/DocumentViewTabs.vue'
-import DocumentToolbar from './components/DocumentToolbar.vue'
-import DocumentFilterBar from './components/DocumentFilterBar.vue'
-import DocumentStatsRow from './components/DocumentStatsRow.vue'
-import DocumentTable from './components/DocumentTable.vue'
-import DocumentPagination from './components/DocumentPagination.vue'
-import ColumnConfigPanel from './components/ColumnConfigPanel.vue'
-
-interface Props {
-  configId: string
-}
-
-const props = defineProps<Props>()
-const route = useRoute()
-const router = useRouter()
-
-const config = computed(() => doConfigs[props.configId])
-
-// Guard: unknown DO config
-const isUnknown = computed(() => !config.value)
-
-const {
-  activeTab,
-  rows,
-  loading,
-  pagination,
-  filters,
-  table,
-  load,
-  onSortChanged,
-  onFiltersApplied,
-  setTab,
-} = useDocumentPage(config.value ?? doConfigs['do2'])
-
-function onToolbarAction(key: string): void {
-  if (key === 'refresh') { load(); return }
-  if (key === 'export') { table.exportToCsv(); return }
-}
-
-let _searchTimer: ReturnType<typeof setTimeout>
-function onSearch(query: string): void {
-  clearTimeout(_searchTimer)
-  filters.setFilter('_search', query)
-  _searchTimer = setTimeout(() => {
-    pagination.reset()
-    load()
-  }, 300)
-}
-
-function onRowClicked(data: Record<string, unknown>): void {
-  const code = data['code']
-  if (code !== undefined) {
-    router.push(`/do/${props.configId}/${code}`)
-  }
-}
-
-function onEnableSelect(_data: Record<string, unknown>): void {
-  table.enableSelection()
-}
-
-function onView(data: Record<string, unknown>): void {
-  onRowClicked(data)
-}
-
-function onEdit(_data: Record<string, unknown>): void {
-  // TODO: open edit modal
-}
-
-function onDelete(_data: Record<string, unknown>): void {
-  // TODO: confirm + delete
-}
-</script>
-
 <template>
   <div v-if="isUnknown" class="flex items-center justify-center h-64 text-gray-500 text-sm">
     Неизвестный тип ДО: <code class="ml-2 font-mono text-red-500">{{ configId }}</code>
@@ -167,3 +88,82 @@ function onDelete(_data: Record<string, unknown>): void {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { doConfigs } from './config/index'
+import { useDocumentPage } from './composables/useDocumentPage'
+import DocumentHeader from './components/DocumentHeader.vue'
+import DocumentViewTabs from './components/DocumentViewTabs.vue'
+import DocumentToolbar from './components/DocumentToolbar.vue'
+import DocumentFilterBar from './components/DocumentFilterBar.vue'
+import DocumentStatsRow from './components/DocumentStatsRow.vue'
+import DocumentTable from './components/DocumentTable.vue'
+import DocumentPagination from './components/DocumentPagination.vue'
+import ColumnConfigPanel from './components/ColumnConfigPanel.vue'
+
+interface Props {
+  configId: string
+}
+
+const props = defineProps<Props>()
+const route = useRoute()
+const router = useRouter()
+
+const config = computed(() => doConfigs[props.configId])
+
+// Guard: unknown DO config
+const isUnknown = computed(() => !config.value)
+
+const {
+  activeTab,
+  rows,
+  loading,
+  pagination,
+  filters,
+  table,
+  load,
+  onSortChanged,
+  onFiltersApplied,
+  setTab,
+} = useDocumentPage(config.value ?? doConfigs['do2'])
+
+function onToolbarAction(key: string): void {
+  if (key === 'refresh') { load(); return }
+  if (key === 'export') { table.exportToCsv(); return }
+}
+
+let _searchTimer: ReturnType<typeof setTimeout>
+function onSearch(query: string): void {
+  clearTimeout(_searchTimer)
+  filters.setFilter('_search', query)
+  _searchTimer = setTimeout(() => {
+    pagination.reset()
+    load()
+  }, 300)
+}
+
+function onRowClicked(data: Record<string, unknown>): void {
+  const code = data['code']
+  if (code !== undefined) {
+    router.push(`/do/${props.configId}/${code}`)
+  }
+}
+
+function onEnableSelect(_data: Record<string, unknown>): void {
+  table.enableSelection()
+}
+
+function onView(data: Record<string, unknown>): void {
+  onRowClicked(data)
+}
+
+function onEdit(_data: Record<string, unknown>): void {
+  // TODO: open edit modal
+}
+
+function onDelete(_data: Record<string, unknown>): void {
+  // TODO: confirm + delete
+}
+</script>

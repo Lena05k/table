@@ -1,25 +1,3 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-
-interface Props {
-  title: string
-}
-defineProps<Props>()
-
-const emit = defineEmits<{
-  (e: 'search', query: string): void
-  (e: 'favorite'): void
-}>()
-
-const searchQuery = ref('')
-
-function onInput(e: Event): void {
-  const value = (e.target as HTMLInputElement).value
-  searchQuery.value = value
-  emit('search', value)
-}
-</script>
-
 <template>
   <div class="flex items-center justify-between px-5 pt-5 pb-3">
     <div class="flex items-center gap-2">
@@ -52,3 +30,25 @@ function onInput(e: Event): void {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+interface Props {
+  title: string
+}
+defineProps<Props>()
+
+const emit = defineEmits<{
+  (e: 'search', query: string): void
+  (e: 'favorite'): void
+}>()
+
+const searchQuery = ref('')
+
+function onInput(e: Event): void {
+  const value = (e.target as HTMLInputElement).value
+  searchQuery.value = value
+  emit('search', value)
+}
+</script>

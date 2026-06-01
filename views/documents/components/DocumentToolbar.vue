@@ -1,3 +1,49 @@
+<template>
+  <div class="flex items-center gap-2">
+    <template v-for="action in actions" :key="action.key">
+      <button
+          v-if="action.variant === 'primary'"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors"
+          @click="emit('action', action.key)"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
+        </svg>
+        {{ action.label }}
+      </button>
+
+      <button
+          v-else-if="action.variant === 'default'"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 text-sm text-gray-700 transition-colors"
+          @click="emit('action', action.key)"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
+        </svg>
+        {{ action.label }}
+        <svg
+            v-if="action.hasDropdown"
+            class="w-3 h-3 ml-0.5"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <button
+          v-else-if="action.variant === 'icon'"
+          class="p-1.5 rounded border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors"
+          :title="action.label || action.key"
+          @click="emit('action', action.key)"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
+        </svg>
+      </button>
+    </template>
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { ToolbarAction, ToolbarIcon } from '../config/types'
 
@@ -19,49 +65,3 @@ const ICONS: Record<ToolbarIcon, string> = {
   'ellipsis-horizontal': 'M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z',
 }
 </script>
-
-<template>
-  <div class="flex items-center gap-2">
-    <template v-for="action in actions" :key="action.key">
-      <button
-        v-if="action.variant === 'primary'"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors"
-        @click="emit('action', action.key)"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
-        </svg>
-        {{ action.label }}
-      </button>
-
-      <button
-        v-else-if="action.variant === 'default'"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 text-sm text-gray-700 transition-colors"
-        @click="emit('action', action.key)"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
-        </svg>
-        {{ action.label }}
-        <svg
-          v-if="action.hasDropdown"
-          class="w-3 h-3 ml-0.5"
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      <button
-        v-else-if="action.variant === 'icon'"
-        class="p-1.5 rounded border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors"
-        :title="action.label || action.key"
-        @click="emit('action', action.key)"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
-        </svg>
-      </button>
-    </template>
-  </div>
-</template>

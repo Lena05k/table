@@ -1,12 +1,3 @@
-<script setup lang="ts">
-import type { PaginationState } from '../composables/usePagination'
-
-interface Props {
-  paginationState: PaginationState
-}
-defineProps<Props>()
-</script>
-
 <template>
   <div class="flex items-center justify-between px-5 py-3 border-t border-gray-200 bg-white text-sm text-gray-600">
     <!-- Rows per page -->
@@ -83,3 +74,12 @@ defineProps<Props>()
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { PaginationState } from '../composables/usePagination'
+
+interface Props {
+  paginationState: PaginationState
+}
+defineProps<Props>()
+</script>

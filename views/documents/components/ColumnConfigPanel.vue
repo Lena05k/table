@@ -1,40 +1,3 @@
-<script setup lang="ts">
-import { ref, watch } from 'vue'
-import type { DocumentTableState } from '../composables/useDocumentTable'
-
-interface Props {
-  tableState: DocumentTableState
-}
-const props = defineProps<Props>()
-
-const columns = ref<Array<{ colId: string; headerName: string; visible: boolean; pinned: string | null | boolean }>>([])
-
-watch(
-  () => props.tableState.columnPanelOpen.value,
-  (open) => {
-    if (open) columns.value = props.tableState.getAllColumns()
-  },
-)
-
-function toggle(colId: string): void {
-  const col = columns.value.find((c) => c.colId === colId)
-  if (!col) return
-  col.visible = !col.visible
-  props.tableState.setColumnVisible(colId, col.visible)
-}
-
-function pin(colId: string, side: 'left' | 'right' | null): void {
-  props.tableState.gridApi.value?.setColumnsPinned([colId], side)
-  props.tableState.saveColumnState()
-  columns.value = props.tableState.getAllColumns()
-}
-
-function resetAll(): void {
-  props.tableState.resetColumnState()
-  columns.value = props.tableState.getAllColumns()
-}
-</script>
-
 <template>
   <Transition name="slide">
     <div
@@ -129,6 +92,43 @@ function resetAll(): void {
     />
   </Transition>
 </template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import type { DocumentTableState } from '../composables/useDocumentTable'
+
+interface Props {
+  tableState: DocumentTableState
+}
+const props = defineProps<Props>()
+
+const columns = ref<Array<{ colId: string; headerName: string; visible: boolean; pinned: string | null | boolean }>>([])
+
+watch(
+    () => props.tableState.columnPanelOpen.value,
+    (open) => {
+      if (open) columns.value = props.tableState.getAllColumns()
+    },
+)
+
+function toggle(colId: string): void {
+  const col = columns.value.find((c) => c.colId === colId)
+  if (!col) return
+  col.visible = !col.visible
+  props.tableState.setColumnVisible(colId, col.visible)
+}
+
+function pin(colId: string, side: 'left' | 'right' | null): void {
+  props.tableState.gridApi.value?.setColumnsPinned([colId], side)
+  props.tableState.saveColumnState()
+  columns.value = props.tableState.getAllColumns()
+}
+
+function resetAll(): void {
+  props.tableState.resetColumnState()
+  columns.value = props.tableState.getAllColumns()
+}
+</script>
 
 <style scoped>
 .slide-enter-active,

@@ -1,3 +1,27 @@
+<template>
+  <div
+    v-if="hasContent()"
+    class="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-gray-100 bg-gray-50"
+  >
+    <OperationsBlock
+      v-if="operations && operations.length > 0"
+      :operations="operations"
+      @operate="(p) => emit('operate', p)"
+    />
+
+    <StageCountBlock
+      v-for="block in statsBlocks"
+      :key="block.key"
+      :label="block.label"
+      :count="stageCounts[block.key] ?? 0"
+    />
+
+    <PostalWorkBlock
+      v-if="specialBlocks?.includes('postal-work')"
+    />
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { StatsBlockConfig, OperationConfig, SpecialBlockKey } from '../config/types'
 import OperationsBlock from './blocks/OperationsBlock.vue'
@@ -23,31 +47,7 @@ const emit = defineEmits<{
 }>()
 
 const hasContent = () =>
-  (props.operations?.length ?? 0) > 0 ||
-  (props.statsBlocks?.length ?? 0) > 0 ||
-  (props.specialBlocks?.length ?? 0) > 0
+    (props.operations?.length ?? 0) > 0 ||
+    (props.statsBlocks?.length ?? 0) > 0 ||
+    (props.specialBlocks?.length ?? 0) > 0
 </script>
-
-<template>
-  <div
-    v-if="hasContent()"
-    class="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-gray-100 bg-gray-50"
-  >
-    <OperationsBlock
-      v-if="operations && operations.length > 0"
-      :operations="operations"
-      @operate="(p) => emit('operate', p)"
-    />
-
-    <StageCountBlock
-      v-for="block in statsBlocks"
-      :key="block.key"
-      :label="block.label"
-      :count="stageCounts[block.key] ?? 0"
-    />
-
-    <PostalWorkBlock
-      v-if="specialBlocks?.includes('postal-work')"
-    />
-  </div>
-</template>

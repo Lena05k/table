@@ -1,3 +1,15 @@
+<template>
+  <div class="flex items-center justify-center h-full">
+    <input
+      type="radio"
+      name="row-radio-select"
+      :checked="selected"
+      class="w-4 h-4 cursor-pointer accent-orange-500"
+      @change="onRadioChange"
+    />
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import type { ICellRendererParams } from 'ag-grid-community'
@@ -22,15 +34,3 @@ function onRadioChange(): void {
   props.params.node.setSelected(true, true)
 }
 </script>
-
-<template>
-  <div class="flex items-center justify-center h-full">
-    <input
-      type="radio"
-      name="row-radio-select"
-      :checked="selected"
-      class="w-4 h-4 cursor-pointer accent-orange-500"
-      @change="onRadioChange"
-    />
-  </div>
-</template>
