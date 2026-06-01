@@ -1,3 +1,48 @@
+<template>
+  <div class="vdw">
+    <!-- ── Поиск + счётчик ─────────────────────────────────────────── -->
+    <div class="vdw__toolbar">
+      <div class="vdw__search-wrap">
+        <svg class="vdw__search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+        <input
+          type="text"
+          class="vdw__search-input"
+          placeholder="Поиск в таблице..."
+          @input="onSearchInput"
+        />
+      </div>
+      <span class="vdw__count">
+        {{ rowData.length === allRowData.length
+          ? `${allRowData.length} записей`
+          : `${rowData.length} из ${allRowData.length}` }}
+      </span>
+    </div>
+
+    <!-- ── AG-Grid ──────────────────────────────────────────────────── -->
+    <AgGridVue
+      theme="legacy"
+      class="ag-theme-alpine vdw__grid"
+      domLayout="autoHeight"
+      :columnDefs="colDefs"
+      :rowData="rowData"
+      :defaultColDef="defaultColDef"
+      :suppressPaginationPanel="true"
+      @grid-ready="onGridReady"
+      @row-clicked="onRowClicked"
+    />
+
+    <!-- ── Пустые состояния ─────────────────────────────────────────── -->
+    <div v-if="rowData.length === 0 && allRowData.length > 0" class="vdw__empty">
+      По запросу «{{ searchQuery }}» ничего не найдено
+    </div>
+    <div v-else-if="allRowData.length === 0" class="vdw__empty">
+      Поиск не дал результатов
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
@@ -61,7 +106,6 @@ const allRowData = computed<Record<string, unknown>[]>(() =>
       if (firstCellValue === null) firstCellValue = String(cell.value ?? '')
     }
 
-    // ID документа: из явного массива docIds, иначе значение первой ячейки
     row['_docId'] = docIds.value[rowIdx] ?? firstCellValue ?? ''
     return row
   }),
@@ -135,51 +179,6 @@ function onRowClicked(e: RowClickedEvent<Record<string, unknown>>): void {
   }
 }
 </script>
-
-<template>
-  <div class="vdw">
-    <!-- ── Поиск + счётчик ─────────────────────────────────────────── -->
-    <div class="vdw__toolbar">
-      <div class="vdw__search-wrap">
-        <svg class="vdw__search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-        </svg>
-        <input
-          type="text"
-          class="vdw__search-input"
-          placeholder="Поиск в таблице..."
-          @input="onSearchInput"
-        />
-      </div>
-      <span class="vdw__count">
-        {{ rowData.length === allRowData.length
-          ? `${allRowData.length} записей`
-          : `${rowData.length} из ${allRowData.length}` }}
-      </span>
-    </div>
-
-    <!-- ── AG-Grid ──────────────────────────────────────────────────── -->
-    <AgGridVue
-      theme="legacy"
-      class="ag-theme-alpine vdw__grid"
-      domLayout="autoHeight"
-      :columnDefs="colDefs"
-      :rowData="rowData"
-      :defaultColDef="defaultColDef"
-      :suppressPaginationPanel="true"
-      @grid-ready="onGridReady"
-      @row-clicked="onRowClicked"
-    />
-
-    <!-- ── Пустые состояния ─────────────────────────────────────────── -->
-    <div v-if="rowData.length === 0 && allRowData.length > 0" class="vdw__empty">
-      По запросу «{{ searchQuery }}» ничего не найдено
-    </div>
-    <div v-else-if="allRowData.length === 0" class="vdw__empty">
-      Поиск не дал результатов
-    </div>
-  </div>
-</template>
 
 <style>
 /* Не scoped — иначе AG-Grid не видит стили для своих порталов */
