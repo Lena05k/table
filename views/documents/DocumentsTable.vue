@@ -1,19 +1,22 @@
 <template>
-  <div class="vdw">
+  <div class="text-sm [&_.ag-row]:cursor-pointer">
     <!-- ── Поиск + счётчик ─────────────────────────────────────────── -->
-    <div class="vdw__toolbar">
-      <div class="vdw__search-wrap">
-        <svg class="vdw__search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <div class="flex items-center gap-3 py-2">
+      <div class="relative shrink-0 w-[280px]">
+        <svg
+          class="absolute left-[9px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
         <input
           type="text"
-          class="vdw__search-input"
+          class="w-full py-1.5 pr-2.5 pl-[30px] text-[13px] border border-gray-300 rounded outline-none bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/15"
           placeholder="Поиск в таблице..."
           @input="onSearchInput"
         />
       </div>
-      <span class="vdw__count">
+      <span class="text-xs text-gray-500 whitespace-nowrap">
         {{ rowData.length === allRowData.length
           ? `${allRowData.length} записей`
           : `${rowData.length} из ${allRowData.length}` }}
@@ -23,7 +26,7 @@
     <!-- ── AG-Grid ──────────────────────────────────────────────────── -->
     <AgGridVue
       theme="legacy"
-      class="ag-theme-alpine vdw__grid"
+      class="ag-theme-alpine w-full"
       domLayout="autoHeight"
       :columnDefs="colDefs"
       :rowData="rowData"
@@ -34,10 +37,10 @@
     />
 
     <!-- ── Пустые состояния ─────────────────────────────────────────── -->
-    <div v-if="rowData.length === 0 && allRowData.length > 0" class="vdw__empty">
+    <div v-if="rowData.length === 0 && allRowData.length > 0" class="p-6 text-center text-gray-400 text-[13px]">
       По запросу «{{ searchQuery }}» ничего не найдено
     </div>
-    <div v-else-if="allRowData.length === 0" class="vdw__empty">
+    <div v-else-if="allRowData.length === 0" class="p-6 text-center text-gray-400 text-[13px]">
       Поиск не дал результатов
     </div>
   </div>
@@ -161,72 +164,3 @@ function onRowClicked(e: RowClickedEvent<Record<string, unknown>>): void {
   }
 }
 </script>
-
-<style>
-/* Не scoped — иначе AG-Grid не видит стили для своих порталов */
-.vdw {
-  font-family: inherit;
-  font-size: 14px;
-}
-
-.vdw__toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-}
-
-.vdw__search-wrap {
-  position: relative;
-  flex: 0 0 280px;
-}
-
-.vdw__search-icon {
-  position: absolute;
-  left: 9px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
-  color: #9ca3af;
-  pointer-events: none;
-}
-
-.vdw__search-input {
-  width: 100%;
-  padding: 6px 10px 6px 30px;
-  font-size: 13px;
-  border: 1px solid #d1d5db;
-  border-radius: 5px;
-  outline: none;
-  background: #fff;
-  box-sizing: border-box;
-}
-
-.vdw__search-input:focus {
-  border-color: #f97316;
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
-}
-
-.vdw__count {
-  font-size: 12px;
-  color: #6b7280;
-  white-space: nowrap;
-}
-
-.vdw__grid {
-  width: 100%;
-}
-
-.vdw__empty {
-  padding: 24px;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 13px;
-}
-
-/* Строки кликабельны */
-.vdw .ag-row {
-  cursor: pointer;
-}
-</style>
