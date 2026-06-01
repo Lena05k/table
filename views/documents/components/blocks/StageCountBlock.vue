@@ -1,6 +1,6 @@
 <template>
-  <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-gray-200 bg-gray-50 text-sm text-gray-700">
-    <span class="font-semibold text-orange-600">{{ count }}</span>
+  <div class="tw-inline-flex tw-items-center tw-gap-2 tw-px-3 tw-py-1.5 tw-rounded tw-border tw-border-gray-200 tw-bg-gray-50 tw-text-sm tw-text-gray-700">
+    <span class="tw-font-semibold tw-text-orange-600">{{ count }}</span>
     <span>{{ label }}</span>
   </div>
 </template>

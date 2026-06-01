@@ -1,10 +1,10 @@
 <template>
-  <div class="flex items-center justify-center h-full">
+  <div class="tw-flex tw-items-center tw-justify-center tw-h-full">
     <input
       type="radio"
       name="row-radio-select"
       :checked="selected"
-      class="w-4 h-4 cursor-pointer accent-orange-500"
+      class="tw-w-4 tw-h-4 tw-cursor-pointer tw-accent-orange-500"
       @change="onRadioChange"
     />
   </div>

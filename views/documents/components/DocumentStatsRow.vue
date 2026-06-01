@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="hasContent()"
-    class="flex flex-wrap items-center gap-2 px-5 py-2.5 border-b border-gray-100 bg-gray-50"
+    class="tw-flex tw-flex-wrap tw-items-center tw-gap-2 tw-px-5 tw-py-2.5 tw-border-b tw-border-gray-100 tw-bg-gray-50"
   >
     <OperationsBlock
       v-if="operations && operations.length > 0"

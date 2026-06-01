@@ -1,6 +1,6 @@
 <template>
   <button
-    class="text-blue-600 hover:text-blue-800 hover:underline font-medium text-sm"
+    class="tw-text-blue-600 hover:tw-text-blue-800 hover:tw-underline tw-font-medium tw-text-sm"
     @click.stop="emit('navigate', value)"
   >
     {{ value }}

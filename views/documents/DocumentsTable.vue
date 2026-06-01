@@ -1,22 +1,22 @@
 <template>
-  <div class="text-sm [&_.ag-row]:cursor-pointer">
+  <div class="tw-text-sm [&_.ag-row]:tw-cursor-pointer">
     <!-- ── Поиск + счётчик ─────────────────────────────────────────── -->
-    <div class="flex items-center gap-3 py-2">
-      <div class="relative shrink-0 w-[280px]">
+    <div class="tw-flex tw-items-center tw-gap-3 tw-py-2">
+      <div class="tw-relative tw-shrink-0 tw-w-[280px]">
         <svg
-          class="absolute left-[9px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
+          class="tw-absolute tw-left-[9px] tw-top-1/2 -tw-translate-y-1/2 tw-w-3.5 tw-h-3.5 tw-text-gray-400 tw-pointer-events-none"
           fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
         <input
           type="text"
-          class="w-full py-1.5 pr-2.5 pl-[30px] text-[13px] border border-gray-300 rounded outline-none bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/15"
+          class="tw-w-full tw-py-1.5 tw-pr-2.5 tw-pl-[30px] tw-text-[13px] tw-border tw-border-gray-300 tw-rounded tw-outline-none tw-bg-white focus:tw-border-orange-500 focus:tw-ring-2 focus:tw-ring-orange-500/15"
           placeholder="Поиск в таблице..."
           @input="onSearchInput"
         />
       </div>
-      <span class="text-xs text-gray-500 whitespace-nowrap">
+      <span class="tw-text-xs tw-text-gray-500 tw-whitespace-nowrap">
         {{ rowData.length === allRowData.length
           ? `${allRowData.length} записей`
           : `${rowData.length} из ${allRowData.length}` }}
@@ -26,7 +26,7 @@
     <!-- ── AG-Grid ──────────────────────────────────────────────────── -->
     <AgGridVue
       theme="legacy"
-      class="ag-theme-alpine w-full"
+      class="ag-theme-alpine tw-w-full"
       domLayout="autoHeight"
       :columnDefs="colDefs"
       :rowData="rowData"
@@ -37,10 +37,10 @@
     />
 
     <!-- ── Пустые состояния ─────────────────────────────────────────── -->
-    <div v-if="rowData.length === 0 && allRowData.length > 0" class="p-6 text-center text-gray-400 text-[13px]">
+    <div v-if="rowData.length === 0 && allRowData.length > 0" class="tw-p-6 tw-text-center tw-text-gray-400 tw-text-[13px]">
       По запросу «{{ searchQuery }}» ничего не найдено
     </div>
-    <div v-else-if="allRowData.length === 0" class="p-6 text-center text-gray-400 text-[13px]">
+    <div v-else-if="allRowData.length === 0" class="tw-p-6 tw-text-center tw-text-gray-400 tw-text-[13px]">
       Поиск не дал результатов
     </div>
   </div>

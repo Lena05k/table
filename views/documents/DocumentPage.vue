@@ -1,10 +1,10 @@
 <template>
-  <div v-if="isUnknown" class="flex items-center justify-center h-64 text-gray-500 text-sm">
-    Неизвестный тип ДО: <code class="ml-2 font-mono text-red-500">{{ configId }}</code>
+  <div v-if="isUnknown" class="tw-flex tw-items-center tw-justify-center tw-h-64 tw-text-gray-500 tw-text-sm">
+    Неизвестный тип ДО: <code class="tw-ml-2 tw-font-mono tw-text-red-500">{{ configId }}</code>
   </div>
 
-  <div v-else class="h-screen overflow-hidden bg-gray-100 flex justify-center">
-    <div class="w-full max-w-[1700px] h-full bg-white shadow-sm flex flex-col text-gray-900">
+  <div v-else class="tw-h-screen tw-overflow-hidden tw-bg-gray-100 tw-flex tw-justify-center">
+    <div class="tw-w-full tw-max-w-[1700px] tw-h-full tw-bg-white tw-shadow-sm tw-flex tw-flex-col tw-text-gray-900">
       <!-- Title + global search -->
       <DocumentHeader
         :title="config.title"
@@ -21,7 +21,7 @@
       />
 
       <!-- Single action+filter row: [Create][Export][Import][★][↻][...] ··· [Filters][Date][Role][Configure] -->
-      <div class="flex items-center justify-between px-5 py-2.5 gap-4 border-b border-gray-200 bg-white shrink-0">
+      <div class="tw-flex tw-items-center tw-justify-between tw-px-5 tw-py-2.5 tw-gap-4 tw-border-b tw-border-gray-200 tw-bg-white tw-shrink-0">
         <DocumentToolbar
           :actions="config.toolbar"
           @action="onToolbarAction"
@@ -46,7 +46,7 @@
       <!-- Pagination hint message when on first page with many results -->
       <div
         v-if="pagination.page.value === 1 && pagination.total.value > pagination.pageSize.value"
-        class="px-5 py-2 text-xs text-gray-500 bg-blue-50 border-b border-blue-100 shrink-0"
+        class="tw-px-5 tw-py-2 tw-text-xs tw-text-gray-500 tw-bg-blue-50 tw-border-b tw-border-blue-100 tw-shrink-0"
       >
         Показаны первые {{ pagination.pageSize.value }} документов. Чтобы сократить выборку, воспользуйтесь поиском.
       </div>
@@ -54,14 +54,14 @@
       <!-- Kanban placeholder -->
       <div
         v-if="activeTab === 'kanban'"
-        class="flex-1 flex items-center justify-center text-gray-400 text-sm"
+        class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-text-gray-400 tw-text-sm"
       >
         Канбан-вид в разработке
       </div>
 
       <!-- AG-Grid table — flex-1 min-h-0 so it fills remaining space and scrolls internally -->
       <template v-if="activeTab === 'table'">
-        <div class="flex-1 min-h-0 overflow-hidden">
+        <div class="tw-flex-1 tw-min-h-0 tw-overflow-hidden">
           <DocumentTable
             :column-defs="config.columns"
             :row-data="rows"

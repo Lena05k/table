@@ -1,12 +1,12 @@
 <template>
-  <div class="flex items-center gap-2">
+  <div class="tw-flex tw-items-center tw-gap-2">
     <template v-for="action in actions" :key="action.key">
       <button
           v-if="action.variant === 'primary'"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors"
+          class="tw-inline-flex tw-items-center tw-gap-1.5 tw-px-3 tw-py-1.5 tw-rounded tw-bg-orange-500 hover:tw-bg-orange-600 tw-text-white tw-text-sm tw-font-medium tw-transition-colors"
           @click="emit('action', action.key)"
       >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
         </svg>
         {{ action.label }}
@@ -14,16 +14,16 @@
 
       <button
           v-else-if="action.variant === 'default'"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 text-sm text-gray-700 transition-colors"
+          class="tw-inline-flex tw-items-center tw-gap-1.5 tw-px-3 tw-py-1.5 tw-rounded tw-border tw-border-gray-300 tw-bg-white hover:tw-bg-gray-50 tw-text-sm tw-text-gray-700 tw-transition-colors"
           @click="emit('action', action.key)"
       >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
         </svg>
         {{ action.label }}
         <svg
             v-if="action.hasDropdown"
-            class="w-3 h-3 ml-0.5"
+            class="tw-w-3 tw-h-3 tw-ml-0.5"
             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -32,11 +32,11 @@
 
       <button
           v-else-if="action.variant === 'icon'"
-          class="p-1.5 rounded border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors"
+          class="tw-p-1.5 tw-rounded tw-border tw-border-gray-200 tw-bg-white hover:tw-bg-gray-50 tw-text-gray-500 hover:tw-text-gray-700 tw-transition-colors"
           :title="action.label || action.key"
           @click="emit('action', action.key)"
       >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[action.icon]" />
         </svg>
       </button>

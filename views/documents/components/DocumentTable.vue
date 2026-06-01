@@ -1,15 +1,15 @@
 <template>
-  <div class="relative w-full h-full">
+  <div class="tw-relative tw-w-full tw-h-full">
     <div
         v-if="loading"
-        class="absolute inset-0 z-10 flex items-center justify-center bg-white/60"
+        class="tw-absolute tw-inset-0 tw-z-10 tw-flex tw-items-center tw-justify-center tw-bg-white/60"
     >
-      <div class="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      <div class="tw-w-6 tw-h-6 tw-border-2 tw-border-orange-500 tw-border-t-transparent tw-rounded-full tw-animate-spin" />
     </div>
 
     <AgGridVue
         theme="legacy"
-        class="ag-theme-alpine w-full h-full"
+        class="ag-theme-alpine tw-w-full tw-h-full"
         :columnDefs="allColumnDefs"
         :rowData="rowData"
         :defaultColDef="defaultColDef"
