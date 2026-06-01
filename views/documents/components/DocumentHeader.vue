@@ -33,11 +33,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { DocumentHeaderProps } from './types/props'
 
-interface Props {
-  title: string
-}
-defineProps<Props>()
+defineProps<DocumentHeaderProps>()
 
 const emit = defineEmits<{
   (e: 'search', query: string): void

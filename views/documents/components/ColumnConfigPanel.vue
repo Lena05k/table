@@ -95,12 +95,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { DocumentTableState } from '../composables/useDocumentTable'
+import type { ColumnConfigPanelProps } from './types/props'
 
-interface Props {
-  tableState: DocumentTableState
-}
-const props = defineProps<Props>()
+const props = defineProps<ColumnConfigPanelProps>()
 
 const columns = ref<Array<{ colId: string; headerName: string; visible: boolean; pinned: string | null | boolean }>>([])
 

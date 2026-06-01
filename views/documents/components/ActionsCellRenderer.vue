@@ -91,13 +91,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { ICellRendererParams } from 'ag-grid-community'
-
-interface ActionContext {
-  onView: (data: Record<string, unknown>) => void
-  onEnableSelect: (data: Record<string, unknown>) => void
-  onEdit: (data: Record<string, unknown>) => void
-  onDelete: (data: Record<string, unknown>) => void
-}
+import type { ActionContext } from '../types/widget'
 
 type ActionParams = ICellRendererParams<Record<string, unknown>, unknown, ActionContext>
 

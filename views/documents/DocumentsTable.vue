@@ -47,28 +47,9 @@
 import { computed, ref } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
 import type { ColDef, GridApi, GridReadyEvent, RowClickedEvent } from 'ag-grid-community'
-import type { FieldDef, DataCell } from './types/widget'
+import type { FieldDef, DataCell, DocumentsTableProps } from './types/widget'
 
-// ─── Пропы (все строки, т.к. приходят из HTML-атрибутов) ─────────────────────
-
-interface Props {
-  /** JSON: Record<sysName, FieldDef> — передать как {{ fieldAlias|json_encode }} */
-  columnsJson: string
-  /** JSON: DataCell[][] — передать как {{ dataTable|json_encode }} */
-  rowsJson: string
-  /**
-   * JSON: string[] — ID документов в том же порядке что и строки.
-   * Если не передан — используется значение первой колонки.
-   * Пример Smarty: {$docIds|json_encode} где $docIds = array_column($rows, 'ID')
-   */
-  docIdsJson?: string
-  /** progectId для ссылок на документ */
-  classId?: string
-  /** parentDocumentId — если таблица внутри документа (откроет popup) */
-  parentDocumentId?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DocumentsTableProps>(), {
   docIdsJson: '[]',
   classId: '',
   parentDocumentId: '',

@@ -6,9 +6,7 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
-  label: string
-  count: number
-}
-defineProps<Props>()
+import type { StageCountBlockProps } from '../types/props'
+
+defineProps<StageCountBlockProps>()
 </script>

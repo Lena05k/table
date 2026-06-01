@@ -76,10 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PaginationState } from '../composables/usePagination'
+import type { DocumentPaginationProps } from './types/props'
 
-interface Props {
-  paginationState: PaginationState
-}
-defineProps<Props>()
+defineProps<DocumentPaginationProps>()
 </script>

@@ -45,12 +45,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ToolbarAction, ToolbarIcon } from '../config/types'
+import type { ToolbarIcon } from '../config/types'
+import type { DocumentToolbarProps } from './types/props'
 
-interface Props {
-  actions: ToolbarAction[]
-}
-defineProps<Props>()
+defineProps<DocumentToolbarProps>()
 
 const emit = defineEmits<{
   (e: 'action', key: string): void

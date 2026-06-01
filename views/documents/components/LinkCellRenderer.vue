@@ -8,10 +8,9 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
-  value: string | number
-}
-defineProps<Props>()
+import type { LinkCellRendererProps } from './types/props'
+
+defineProps<LinkCellRendererProps>()
 
 const emit = defineEmits<{
   (e: 'navigate', value: string | number): void

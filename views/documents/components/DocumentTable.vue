@@ -41,16 +41,9 @@ import type {
   RowClickedEvent,
 } from 'ag-grid-community'
 import RadioCellRenderer from './RadioCellRenderer.vue'
+import type { DocumentTableProps } from './types/props'
 
-interface Props {
-  columnDefs: (ColDef | ColGroupDef)[]
-  rowData: Record<string, unknown>[]
-  loading?: boolean
-  selectionMode?: boolean
-  rowClassRules?: Record<string, (params: RowClassParams<Record<string, unknown>>) => boolean>
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DocumentTableProps>(), {
   loading: false,
   selectionMode: false,
   rowClassRules: () => ({}),

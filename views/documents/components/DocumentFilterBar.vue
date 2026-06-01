@@ -72,12 +72,9 @@
 </template>
 
 <script setup lang="ts">
-import type { DocumentFiltersState } from '../composables/useDocumentFilters'
+import type { DocumentFilterBarProps } from './types/props'
 
-interface Props {
-  filtersState: DocumentFiltersState
-}
-defineProps<Props>()
+defineProps<DocumentFilterBarProps>()
 
 const emit = defineEmits<{
   (e: 'apply'): void

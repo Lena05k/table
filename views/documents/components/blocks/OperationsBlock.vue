@@ -37,11 +37,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { OperationConfig } from '../../config/types'
+import type { OperationsBlockProps } from '../types/props'
 
-interface Props {
-  operations: OperationConfig[]
-}
-const props = defineProps<Props>()
+const props = defineProps<OperationsBlockProps>()
 
 const emit = defineEmits<{
   (e: 'operate', payload: { type: string; stageId: string; roleId?: string }): void

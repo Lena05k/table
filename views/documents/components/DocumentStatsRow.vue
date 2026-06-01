@@ -23,19 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import type { StatsBlockConfig, OperationConfig, SpecialBlockKey } from '../config/types'
 import OperationsBlock from './blocks/OperationsBlock.vue'
 import StageCountBlock from './blocks/StageCountBlock.vue'
 import PostalWorkBlock from './blocks/PostalWorkBlock.vue'
+import type { DocumentStatsRowProps } from './types/props'
 
-interface Props {
-  statsBlocks?: StatsBlockConfig[]
-  operations?: OperationConfig[]
-  specialBlocks?: SpecialBlockKey[]
-  stageCounts?: Record<string, number>
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DocumentStatsRowProps>(), {
   statsBlocks: () => [],
   operations: () => [],
   specialBlocks: () => [],

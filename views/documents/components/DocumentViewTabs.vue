@@ -30,12 +30,9 @@
 
 <script setup lang="ts">
 import type { TabView } from '../config/types'
+import type { DocumentViewTabsProps } from './types/props'
 
-interface Props {
-  tabs: TabView[]
-  activeTab: TabView
-}
-defineProps<Props>()
+defineProps<DocumentViewTabsProps>()
 
 const emit = defineEmits<{
   (e: 'change', tab: TabView): void

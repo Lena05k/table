@@ -102,12 +102,9 @@ import DocumentStatsRow from './components/DocumentStatsRow.vue'
 import DocumentTable from './components/DocumentTable.vue'
 import DocumentPagination from './components/DocumentPagination.vue'
 import ColumnConfigPanel from './components/ColumnConfigPanel.vue'
+import type { DocumentPageProps } from './types/props'
 
-interface Props {
-  configId: string
-}
-
-const props = defineProps<Props>()
+const props = defineProps<DocumentPageProps>()
 const route = useRoute()
 const router = useRouter()
 
