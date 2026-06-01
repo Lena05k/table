@@ -44,12 +44,19 @@ export function useDocumentTable(doId: string) {
 
   function getAllColumns(): Array<{ colId: string; headerName: string; visible: boolean; pinned: string | null | boolean }> {
     if (!gridApi.value) return []
-    return gridApi.value.getColumnState().map((col) => ({
-      colId: col.colId,
-      headerName: gridApi.value!.getColumn(col.colId)?.getColDef().headerName ?? col.colId,
-      visible: !col.hide,
-      pinned: col.pinned ?? null,
-    }))
+    const state  = gridApi.value.getColumnState()
+    const n      = state.length
+    const result = new Array<{ colId: string; headerName: string; visible: boolean; pinned: string | null | boolean }>(n)
+    for (let i = 0; i < n; i++) {
+      const col  = state[i]
+      result[i] = {
+        colId:      col.colId,
+        headerName: gridApi.value!.getColumn(col.colId)?.getColDef().headerName ?? col.colId,
+        visible:    !col.hide,
+        pinned:     col.pinned ?? null,
+      }
+    }
+    return result
   }
 
   function exportToCsv(): void {

@@ -78,48 +78,68 @@ const docIds = computed<string[]>(() =>
 
 // ─── Преобразование строк ─────────────────────────────────────────────────────
 
-const allRowData = computed<Record<string, unknown>[]>(() =>
-    rawRows.value.map((cells, rowIdx) => {
-      const row: Record<string, unknown> = {}
-      let firstCellValue: string | null = null
-
-      for (const cell of cells) {
-        if (!cell?.sys_name) continue
-        const display = cell.value_title ?? cell.value ?? ''
-        row[cell.sys_name] = display
-        if (firstCellValue === null) firstCellValue = String(cell.value ?? '')
-      }
-
-      // ID документа: из явного массива docIds, иначе значение первой ячейки
-      row['_docId'] = docIds.value[rowIdx] ?? firstCellValue ?? ''
-      return row
-    }),
-)
+const allRowData = computed<Record<string, unknown>[]>(() => {
+  const raw  = rawRows.value
+  const ids  = docIds.value
+  const n    = raw.length
+  const result = new Array<Record<string, unknown>>(n)
+  for (let rowIdx = 0; rowIdx < n; rowIdx++) {
+    const cells = raw[rowIdx]
+    const cLen  = cells.length
+    const row: Record<string, unknown> = {}
+    let firstCellValue: string | null  = null
+    for (let j = 0; j < cLen; j++) {
+      const cell = cells[j]
+      if (!cell?.sys_name) continue
+      const display = cell.value_title ?? cell.value ?? ''
+      row[cell.sys_name] = display
+      if (firstCellValue === null) firstCellValue = String(cell.value ?? '')
+    }
+    row['_docId']   = ids[rowIdx] ?? firstCellValue ?? ''
+    result[rowIdx]  = row
+  }
+  return result
+})
 
 // ─── Поиск ───────────────────────────────────────────────────────────────────
 
 const searchQuery = ref('')
 let _searchTimer: ReturnType<typeof setTimeout>
 
-// Pre-built search index — O(n·m) once when allRowData changes.
-// Each entry is a single lowercase string: all searchable field values joined by \0.
-// Subsequent searches scan this flat array: O(n) with a single String.includes per row,
-// avoiding per-keystroke Object.entries + String() allocations of the naive approach.
-const searchIndex = computed<string[]>(() =>
-  allRowData.value.map((row) =>
-    Object.entries(row)
-      .filter(([k]) => !k.startsWith('_'))
-      .map(([, v]) => v ?? '')
-      .join('\0')
-      .toLowerCase(),
-  ),
-)
+// Search index — built O(n·m) once per allRowData change.
+// Per keystroke: O(n), one String.includes per row.
+const searchIndex = computed<string[]>(() => {
+  const data = allRowData.value
+  const n    = data.length
+  const idx  = new Array<string>(n)
+  for (let i = 0; i < n; i++) {
+    const row  = data[i]
+    const keys = Object.keys(row)
+    const kLen = keys.length
+    let str    = ''
+    for (let j = 0; j < kLen; j++) {
+      const k = keys[j]
+      if (k.charCodeAt(0) === 95) continue // skip '_' prefix fields
+      if (str.length > 0) str += '\0'
+      const v = row[k]
+      if (v !== null && v !== undefined) str += v
+    }
+    idx[i] = str.toLowerCase()
+  }
+  return idx
+})
 
 const rowData = computed<Record<string, unknown>[]>(() => {
   const q = searchQuery.value.trim().toLowerCase()
   if (!q) return allRowData.value
-  const idx = searchIndex.value
-  return allRowData.value.filter((_, i) => idx[i].includes(q))
+  const data   = allRowData.value
+  const idx    = searchIndex.value
+  const n      = data.length
+  const result: Record<string, unknown>[] = []
+  for (let i = 0; i < n; i++) {
+    if (idx[i].includes(q)) result.push(data[i])
+  }
+  return result
 })
 
 function onSearchInput(e: Event): void {
@@ -132,17 +152,24 @@ function onSearchInput(e: Event): void {
 
 const gridApi = ref<GridApi | null>(null)
 
-const colDefs = computed<ColDef[]>(() =>
-    Object.entries(fieldAlias.value).map(([sysName, field]) => ({
-      colId: sysName,
-      field: sysName,
-      headerName: field[0],
-      sortable: field.CAN_SORTING,
-      resizable: true,
-      minWidth: 80,
+const colDefs = computed<ColDef[]>(() => {
+  const entries = Object.entries(fieldAlias.value)
+  const n       = entries.length
+  const result  = new Array<ColDef>(n)
+  for (let i = 0; i < n; i++) {
+    const [sysName, field] = entries[i]
+    result[i] = {
+      colId:                    sysName,
+      field:                    sysName,
+      headerName:               field[0],
+      sortable:                 field.CAN_SORTING,
+      resizable:                true,
+      minWidth:                 80,
       suppressHeaderMenuButton: !field.CAN_SORTING,
-    })),
-)
+    }
+  }
+  return result
+})
 
 const defaultColDef: ColDef = {
   resizable: true,

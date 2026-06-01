@@ -50,7 +50,11 @@ export function usePagination(defaultPageSize: number, pageSizeOptions: number[]
 
   const visiblePages = computed<(number | '...')[]>(() => {
     const count = pageCount.value
-    if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1)
+    if (count <= 7) {
+      const pages = new Array<number | '...'>(count)
+      for (let i = 0; i < count; i++) pages[i] = i + 1
+      return pages
+    }
     const current = page.value
     const pages: (number | '...')[] = [1]
     if (current > 3) pages.push('...')

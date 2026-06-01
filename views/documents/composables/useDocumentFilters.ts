@@ -2,26 +2,40 @@ import { ref, computed } from 'vue'
 import type { FilterConfig } from '../config/types'
 
 export function useDocumentFilters(filterConfigs: FilterConfig[]) {
-  const activeFilters = ref<Record<string, unknown>>(
-    Object.fromEntries(
-      filterConfigs.map((f) => [f.key, f.defaultValue ?? null]),
-    ),
-  )
+  // ── helpers ──────────────────────────────────────────────────────────────
+
+  function _buildDefaults(): Record<string, unknown> {
+    const defaults: Record<string, unknown> = {}
+    for (let i = 0; i < filterConfigs.length; i++) {
+      defaults[filterConfigs[i].key] = filterConfigs[i].defaultValue ?? null
+    }
+    return defaults
+  }
+
+  // ── state ─────────────────────────────────────────────────────────────────
+
+  const activeFilters = ref<Record<string, unknown>>(_buildDefaults())
 
   const dateRange = ref<{ from: string | null; to: string | null }>({
     from: null,
-    to: null,
+    to:   null,
   })
 
   const selectedRole = ref<string>('all')
 
+  // ── computed ──────────────────────────────────────────────────────────────
+
   const activeCount = computed(() => {
-    const filtersCount = Object.values(activeFilters.value).filter(
-      (v) => v !== null && v !== undefined && v !== '',
-    ).length
-    const dateCount = dateRange.value.from || dateRange.value.to ? 1 : 0
-    return filtersCount + dateCount
+    const vals = Object.values(activeFilters.value)
+    let count  = 0
+    for (let i = 0; i < vals.length; i++) {
+      const v = vals[i]
+      if (v !== null && v !== undefined && v !== '') count++
+    }
+    return count + (dateRange.value.from || dateRange.value.to ? 1 : 0)
   })
+
+  // ── mutations ─────────────────────────────────────────────────────────────
 
   function setFilter(key: string, value: unknown): void {
     activeFilters.value = { ...activeFilters.value, [key]: value }
@@ -36,22 +50,22 @@ export function useDocumentFilters(filterConfigs: FilterConfig[]) {
   }
 
   function resetAll(): void {
-    activeFilters.value = Object.fromEntries(
-      filterConfigs.map((f) => [f.key, f.defaultValue ?? null]),
-    )
-    dateRange.value = { from: null, to: null }
-    selectedRole.value = 'all'
+    activeFilters.value = _buildDefaults()
+    dateRange.value     = { from: null, to: null }
+    selectedRole.value  = 'all'
   }
 
   function toQueryParams(): Record<string, unknown> {
-    return {
-      ...Object.fromEntries(
-        Object.entries(activeFilters.value).filter(([, v]) => v !== null && v !== undefined && v !== ''),
-      ),
-      ...(dateRange.value.from ? { dateFrom: dateRange.value.from } : {}),
-      ...(dateRange.value.to ? { dateTo: dateRange.value.to } : {}),
-      ...(selectedRole.value !== 'all' ? { role: selectedRole.value } : {}),
+    const result  = {} as Record<string, unknown>
+    const entries = Object.entries(activeFilters.value)
+    for (let i = 0; i < entries.length; i++) {
+      const [k, v] = entries[i]
+      if (v !== null && v !== undefined && v !== '') result[k] = v
     }
+    if (dateRange.value.from)         result['dateFrom'] = dateRange.value.from
+    if (dateRange.value.to)           result['dateTo']   = dateRange.value.to
+    if (selectedRole.value !== 'all') result['role']     = selectedRole.value
+    return result
   }
 
   return {
