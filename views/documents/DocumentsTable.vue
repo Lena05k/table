@@ -2,25 +2,7 @@
 import { computed, ref } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
 import type { ColDef, GridApi, GridReadyEvent, RowClickedEvent } from 'ag-grid-community'
-
-// ─── Типы, соответствующие структуре данных бэкенда ──────────────────────────
-
-interface FieldDef {
-  0: string           // заголовок колонки
-  1?: string | null   // опциональный стиль
-  FIELD_TYPE: string
-  ID: string
-  CAN_SORTING: boolean
-}
-
-interface DataCell {
-  id: string
-  sys_name: string
-  title: string
-  type: string
-  value: string | null
-  value_title: string | null
-}
+import type { FieldDef, DataCell } from './types/widget'
 
 // ─── Пропы (все строки, т.к. приходят из HTML-атрибутов) ─────────────────────
 
