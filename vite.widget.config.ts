@@ -15,8 +15,8 @@ export default defineConfig({
     outDir: 'dist-widget',
     lib: {
       entry: resolve(__dirname, 'widget.ts'),
-      name: 'VueDpAutoTable',
-      fileName: 'vue-dp-auto-table',
+      name: 'VueDpDocumentsTable',
+      fileName: 'vue-dp-documents-table',
       formats: ['iife'],  // IIFE — работает как <script> без модульной системы
     },
     rollupOptions: {

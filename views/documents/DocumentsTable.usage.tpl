@@ -1,11 +1,11 @@
 {*
-  Пример замены старой таблицы на Vue-виджет vue-dp-auto-table.
+  Пример замены старой таблицы на Vue-виджет vue-dp-documents-table.
 
   Шаги:
   1. Подключите собранный JS в layout или в этом шаблоне:
-       <script src="/assets/vue-dp-auto-table.js"></script>
+       <script src="/assets/vue-dp-documents-table.js"></script>
   2. Зарегистрируйте компонент один раз при инициализации Vue-системы:
-       registerCustomComponent('vue-dp-auto-table', window.VueDpAutoTable)
+       registerCustomComponent('vue-dp-documents-table', window.VueDpDocumentsTable)
   3. Замените старый блок таблицы на тег ниже.
 
   Пропы:
@@ -26,14 +26,14 @@
 
     {* ── Основной вариант: таблица НЕ внутри документа ────────────────────── *}
     {if !$documentData}
-    <vue-dp-auto-table
-        id="vue-dp-auto-table-{$classId}"
+    <vue-dp-documents-table
+        id="vue-dp-documents-table-{$classId}"
         columns-json="{$fieldAlias|json_encode|escape:'html'}"
         rows-json="{$dataTable|json_encode|escape:'html'}"
         doc-ids-json="{$docIdsArr|escape:'html'}"
         class-id="{$classId}"
         table-height="auto"
-    ></vue-dp-auto-table>
+    ></vue-dp-documents-table>
     {/if}
 
     {* ── Вариант: таблица внутри документа (ссылки открывают popup) ─────── *}
@@ -46,8 +46,8 @@
             {assign var='wW' value=1100}
         {/if}
 
-    <vue-dp-auto-table
-        id="vue-dp-auto-table-{$classId}-{$documentData.OBJ_ID}"
+    <vue-dp-documents-table
+        id="vue-dp-documents-table-{$classId}-{$documentData.OBJ_ID}"
         columns-json="{$fieldAlias|json_encode|escape:'html'}"
         rows-json="{$dataTable|json_encode|escape:'html'}"
         doc-ids-json="{$docIdsArr|escape:'html'}"
@@ -56,7 +56,7 @@
         window-height="{$wH}"
         window-width="{$wW}"
         table-height="auto"
-    ></vue-dp-auto-table>
+    ></vue-dp-documents-table>
     {/if}
 
 {else}
@@ -73,12 +73,12 @@
   В таком случае можно опустить doc-ids-json — виджет автоматически
   использует значение первой колонки (обычно это «Код» документа).
 
-  <vue-dp-auto-table
+  <vue-dp-documents-table
       columns-json="{$fieldAlias|json_encode|escape:'html'}"
       rows-json="{$dataTable|json_encode|escape:'html'}"
       class-id="{$classId}"
       table-height="auto"
-  ></vue-dp-auto-table>
+  ></vue-dp-documents-table>
 
   ── Структура данных, которую ожидает компонент ────────────────────────────────
 
