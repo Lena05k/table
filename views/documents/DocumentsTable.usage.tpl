@@ -14,9 +14,6 @@
     doc-ids-json      — массив ID документов (из $tableRow.ID), тот же порядок что rows
     class-id          — $classId (progectId)
     parent-document-id — $documentData.OBJ_ID если таблица внутри документа
-    window-height     — высота всплывающего окна (если parent-document-id задан)
-    window-width      — ширина всплывающего окна
-    table-height      — высота таблицы в px, или 'auto'
 *}
 
 {* ── Собираем массив ID документов в нужном порядке ──────────────────────── *}
@@ -32,20 +29,11 @@
         rows-json="{$dataTable|json_encode|escape:'html'}"
         doc-ids-json="{$docIdsArr|escape:'html'}"
         class-id="{$classId}"
-        table-height="auto"
     ></vue-dp-documents-table>
     {/if}
 
     {* ── Вариант: таблица внутри документа (ссылки открывают popup) ─────── *}
     {if $documentData}
-        {if $classId == 15}
-            {assign var='wH' value=335}
-            {assign var='wW' value=850}
-        {else}
-            {assign var='wH' value=710}
-            {assign var='wW' value=1100}
-        {/if}
-
     <vue-dp-documents-table
         id="vue-dp-documents-table-{$classId}-{$documentData.OBJ_ID}"
         columns-json="{$fieldAlias|json_encode|escape:'html'}"
@@ -53,9 +41,6 @@
         doc-ids-json="{$docIdsArr|escape:'html'}"
         class-id="{$classId}"
         parent-document-id="{$documentData.OBJ_ID}"
-        window-height="{$wH}"
-        window-width="{$wW}"
-        table-height="auto"
     ></vue-dp-documents-table>
     {/if}
 
@@ -77,7 +62,6 @@
       columns-json="{$fieldAlias|json_encode|escape:'html'}"
       rows-json="{$dataTable|json_encode|escape:'html'}"
       class-id="{$classId}"
-      table-height="auto"
   ></vue-dp-documents-table>
 
   ── Структура данных, которую ожидает компонент ────────────────────────────────

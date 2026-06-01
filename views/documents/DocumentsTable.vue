@@ -39,19 +39,12 @@ interface Props {
   classId?: string
   /** parentDocumentId — если таблица внутри документа (откроет popup) */
   parentDocumentId?: string
-  windowHeight?: string
-  windowWidth?: string
-  /** Высота таблицы в px, или 'auto' для autoHeight */
-  tableHeight?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   docIdsJson: '[]',
   classId: '',
   parentDocumentId: '',
-  windowHeight: '710',
-  windowWidth: '1100',
-  tableHeight: '520',
 })
 
 // ─── Парсинг JSON ─────────────────────────────────────────────────────────────
@@ -136,14 +129,6 @@ const defaultColDef: ColDef = {
   minWidth: 80,
 }
 
-const gridStyle = computed(() =>
-  props.tableHeight === 'auto' ? undefined : { height: `${props.tableHeight}px` },
-)
-
-const domLayout = computed<'autoHeight' | undefined>(() =>
-  props.tableHeight === 'auto' ? 'autoHeight' : undefined,
-)
-
 function onGridReady(params: GridReadyEvent): void {
   gridApi.value = params.api
 }
@@ -157,16 +142,11 @@ function onRowClicked(e: RowClickedEvent<Record<string, unknown>>): void {
 
   if (props.parentDocumentId) {
     const url = `/documents/?progectId=${props.classId}&parentDocumentId=${props.parentDocumentId}&documentId=${docId}`
-    // Используем глобальный openWindow если он есть (из легаси-кода)
     const openWindow = (window as unknown as Record<string, unknown>)['openWindow']
     if (typeof openWindow === 'function') {
-      ;(openWindow as (u: string, w: number, h: number) => void)(
-        url,
-        Number(props.windowWidth),
-        Number(props.windowHeight),
-      )
+      ;(openWindow as (u: string, w: number, h: number) => void)(url, 1100, 710)
     } else {
-      window.open(url, '_blank', `width=${props.windowWidth},height=${props.windowHeight}`)
+      window.open(url, '_blank', 'width=1100,height=710')
     }
   } else {
     window.location.href = `?progectId=${props.classId}&documentId=${docId}`
@@ -200,8 +180,7 @@ function onRowClicked(e: RowClickedEvent<Record<string, unknown>>): void {
     <AgGridVue
       theme="legacy"
       class="ag-theme-alpine vdw__grid"
-      :style="gridStyle"
-      :domLayout="domLayout"
+      domLayout="autoHeight"
       :columnDefs="colDefs"
       :rowData="rowData"
       :defaultColDef="defaultColDef"
