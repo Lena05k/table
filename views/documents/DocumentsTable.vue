@@ -101,14 +101,25 @@ const allRowData = computed<Record<string, unknown>[]>(() =>
 const searchQuery = ref('')
 let _searchTimer: ReturnType<typeof setTimeout>
 
+// Pre-built search index — O(n·m) once when allRowData changes.
+// Each entry is a single lowercase string: all searchable field values joined by \0.
+// Subsequent searches scan this flat array: O(n) with a single String.includes per row,
+// avoiding per-keystroke Object.entries + String() allocations of the naive approach.
+const searchIndex = computed<string[]>(() =>
+  allRowData.value.map((row) =>
+    Object.entries(row)
+      .filter(([k]) => !k.startsWith('_'))
+      .map(([, v]) => v ?? '')
+      .join('\0')
+      .toLowerCase(),
+  ),
+)
+
 const rowData = computed<Record<string, unknown>[]>(() => {
   const q = searchQuery.value.trim().toLowerCase()
   if (!q) return allRowData.value
-  return allRowData.value.filter((row) =>
-      Object.entries(row)
-          .filter(([k]) => !k.startsWith('_'))
-          .some(([, v]) => String(v ?? '').toLowerCase().includes(q)),
-  )
+  const idx = searchIndex.value
+  return allRowData.value.filter((_, i) => idx[i].includes(q))
 })
 
 function onSearchInput(e: Event): void {

@@ -19,7 +19,7 @@ export interface FetchDocumentsResult {
   total: number
 }
 
-export async function fetchDocuments(params: FetchDocumentsParams): Promise<FetchDocumentsResult> {
+export async function fetchDocuments(params: FetchDocumentsParams, signal?: AbortSignal): Promise<FetchDocumentsResult> {
   const { doId, page, pageSize, sortField, sortDirection, filters } = params
   const response = await http.get<FetchDocumentsResult>(`/do/${doId}/list`, {
     params: {
@@ -29,6 +29,7 @@ export async function fetchDocuments(params: FetchDocumentsParams): Promise<Fetc
       sortDirection,
       ...filters,
     },
+    signal,
   })
   return response.data
 }
