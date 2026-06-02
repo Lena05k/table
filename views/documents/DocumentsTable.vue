@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
 import type { ColDef, GridApi, GridReadyEvent, RowClickedEvent } from 'ag-grid-community'
 import type { FieldDef, DataCell, DocumentsTableProps } from './types/widget'
@@ -56,6 +56,24 @@ const props = withDefaults(defineProps<DocumentsTableProps>(), {
   docIdsJson: '[]',
   classId: '',
   parentDocumentId: '',
+})
+
+// ─── Диагностика ──────────────────────────────────────────────────────────────
+onMounted(() => {
+  console.group('[vue-dp-documents-table] диагностика')
+  console.log('columnsJson длина:', props.columnsJson?.length ?? 0, 'символов')
+  console.log('rowsJson длина:   ', props.rowsJson?.length    ?? 0, 'символов')
+  console.log('classId:          ', props.classId)
+  console.log('docIdsJson длина: ', props.docIdsJson?.length  ?? 0, 'символов')
+  try {
+    const cols = JSON.parse(props.columnsJson)
+    console.log('Колонок:          ', Object.keys(cols).length)
+  } catch { console.warn('columnsJson не является валидным JSON') }
+  try {
+    const rows = JSON.parse(props.rowsJson)
+    console.log('Строк:            ', rows.length)
+  } catch { console.warn('rowsJson не является валидным JSON') }
+  console.groupEnd()
 })
 
 // ─── Парсинг JSON ─────────────────────────────────────────────────────────────
