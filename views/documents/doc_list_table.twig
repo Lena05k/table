@@ -1,18 +1,8 @@
-{# Таблица со списком документов — Vue-виджет vue-dp-documents-table #}
+{# Таблица со списком документов #}
+{# documentTablePlugin — HTML-строка из DocumentTablePlugin\Controller::getInstance() #}
+{# kanbanPlugin        — HTML-строка из KanbanPlugin\Controller::getInstance()        #}
 
 {% if dataTable is iterable and dataTable|length > 0 %}
-
-    {# Размер всплывающего окна при открытии документа #}
-    {% if classId == 15 %}
-        {% set windowHeight = 335 %}
-        {% set windowWidth  = 850 %}
-    {% else %}
-        {% set windowHeight = 710 %}
-        {% set windowWidth  = 1100 %}
-    {% endif %}
-
-    {# Собираем массив ID документов в том же порядке что строки #}
-    {% set docIdsArr %}[{% for tableRow in dataTable %}{{ tableRow.ID }}{% if not loop.last %},{% endif %}{% endfor %}]{% endset %}
 
     <div id="tablewrapper" class="doc-list-table">
 
@@ -22,28 +12,19 @@
             <button id="showKanbanBtn" type="button">Канбан</button>
         {% endif %}
 
-        {# ── Пагинация (серверная) ────────────────────────────────────────── #}
+        {# ── Серверная пагинация (сверху) ────────────────────────────────── #}
         {% if hasPagination %}
             <div class="pagination pagination__top">
                 {{ _self.paginate(paginationPages, paginationTotal, formatter) }}
             </div>
         {% endif %}
 
-        {# ── Vue-таблица (заменяет старый <table>) ───────────────────────── #}
+        {# ── Vue-таблица (аналог kanbanPlugin) ───────────────────────────── #}
         <div id="tableView">
-            <vue-dp-documents-table
-                id="vue-dp-documents-table-{{ classId }}"
-                columns-json="{{ fieldAlias|json_encode|e('html') }}"
-                rows-json="{{ dataTable|json_encode|e('html') }}"
-                doc-ids-json="{{ docIdsArr|e('html') }}"
-                class-id="{{ classId }}"
-                {% if documentData %}
-                parent-document-id="{{ documentData.OBJ_ID }}"
-                {% endif %}
-            ></vue-dp-documents-table>
+            {{ documentTablePlugin|raw }}
         </div>
 
-        {# ── Канбан-плагин (не тронут, остаётся как был) ─────────────────── #}
+        {# ── Канбан-плагин (не тронут) ────────────────────────────────────── #}
         {% if kanbanPlugin %}
             <div id="kanbanView" style="display: none">
                 <div class="kanban-wrapper">
@@ -60,7 +41,7 @@
     </div>
 {% endif %}
 
-{# ── Макрос пагинации (аналог {function name=paginate} из старого шаблона) ── #}
+{# ── Макрос пагинации ────────────────────────────────────────────────────── #}
 {% macro paginate(pages, total, formatter) %}
     Навигация:
     <ul class="pagination--list">
