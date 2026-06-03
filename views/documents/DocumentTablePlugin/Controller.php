@@ -94,7 +94,7 @@ class Controller
     columns-json="{$columnsJson}"
     rows-json="{$rowsJson}"
     doc-ids-json="{$docIdsJson}"
-    class-id="{$classId}"{$parentAttr}
+    project="{$classId}"{$parentAttr}
 ></vue-dp-documents-table>
 HTML;
     }

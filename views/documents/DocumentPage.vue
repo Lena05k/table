@@ -93,7 +93,7 @@ import type { FieldDef, DataCell } from './types/widget'
 
 const props = withDefaults(defineProps<DocumentPageProps>(), {
   docIdsJson: '[]',
-  classId: '',
+  project: '',
   parentDocumentId: '',
   title: '',
 })
@@ -255,16 +255,16 @@ const countLabel = computed(() => {
 
 // ─── AG-Grid table state ──────────────────────────────────────────────────────
 
-const table = useDocumentTable(props.classId || 'doc')
+const table = useDocumentTable(props.project || 'doc')
 
 // ─── Row navigation ───────────────────────────────────────────────────────────
 
 function onRowClicked(data: Record<string, unknown>): void {
   const docId = data['_docId']
-  if (!docId || !props.classId) return
+  if (!docId || !props.project) return
 
   if (props.parentDocumentId) {
-    const url = `/documents/?progectId=${props.classId}&parentDocumentId=${props.parentDocumentId}&documentId=${docId}`
+    const url = `/documents/?progectId=${props.project}&parentDocumentId=${props.parentDocumentId}&documentId=${docId}`
     const openWindow = (window as unknown as Record<string, unknown>)['openWindow']
     if (typeof openWindow === 'function') {
       ;(openWindow as (u: string, w: number, h: number) => void)(url, 1100, 710)
@@ -272,7 +272,7 @@ function onRowClicked(data: Record<string, unknown>): void {
       window.open(url, '_blank', 'width=1100,height=710')
     }
   } else {
-    window.location.href = `?progectId=${props.classId}&documentId=${docId}`
+    window.location.href = `?progectId=${props.project}&documentId=${docId}`
   }
 }
 </script>

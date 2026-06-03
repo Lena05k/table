@@ -2,7 +2,7 @@ export interface DocumentPageProps {
   columnsJson: string
   rowsJson: string
   docIdsJson?: string
-  classId?: string
+  project?: string
   parentDocumentId?: string
   title?: string
 }
