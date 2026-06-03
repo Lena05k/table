@@ -109,12 +109,12 @@ function safeJson<T>(json: string, fallback: T): T {
 
 // ─── Parse props ──────────────────────────────────────────────────────────────
 
-const fieldAlias = computed<Record<string, FieldDef>>(() =>
-  safeJson(props.columnsJson, {}),
+const columns = computed<Record<string, FieldDef>>(() =>
+  safeJson(props.fieldAlias, {}),
 )
 
-const rawRows = computed<DataCell[][]>(() =>
-  safeJson(props.rowsJson, []),
+const rows = computed<DataCell[][]>(() =>
+  safeJson(props.dataTable, []),
 )
 
 const docIds = computed<string[]>(() =>
@@ -124,7 +124,7 @@ const docIds = computed<string[]>(() =>
 // ─── Column definitions ───────────────────────────────────────────────────────
 
 const colDefs = computed<ColDef[]>(() => {
-  const entries = Object.entries(fieldAlias.value)
+  const entries = Object.entries(columns.value)
   const n       = entries.length
   const result  = new Array<ColDef>(n)
   for (let i = 0; i < n; i++) {
@@ -145,7 +145,7 @@ const colDefs = computed<ColDef[]>(() => {
 // ─── Row data ─────────────────────────────────────────────────────────────────
 
 const allRowData = computed<Record<string, unknown>[]>(() => {
-  const raw  = rawRows.value
+  const raw  = rows.value
   const ids  = docIds.value
   const n    = raw.length
   const result = new Array<Record<string, unknown>>(n)
@@ -220,12 +220,12 @@ const sortModel = ref<{ colId: string; sort: string }[]>([])
 
 const sortedRows = computed<Record<string, unknown>[]>(() => {
   if (!sortModel.value.length) return filteredRows.value
-  const rows = filteredRows.value.slice()
+  const sorted = filteredRows.value.slice()
   const { colId, sort } = sortModel.value[0]
   const dir = sort === 'asc' ? 1 : -1
   const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true })
-  rows.sort((a, b) => dir * collator.compare(String(a[colId] ?? ''), String(b[colId] ?? '')))
-  return rows
+  sorted.sort((a, b) => dir * collator.compare(String(a[colId] ?? ''), String(b[colId] ?? '')))
+  return sorted
 })
 
 function onSortChanged(model: { colId: string; sort: string }[]): void {
@@ -237,8 +237,8 @@ function onSortChanged(model: { colId: string; sort: string }[]): void {
 
 const pagination = usePagination(50, [25, 50, 100, 200])
 
-watch(sortedRows, (rows) => {
-  pagination.setTotal(rows.length)
+watch(sortedRows, (r) => {
+  pagination.setTotal(r.length)
 }, { immediate: true })
 
 const pageRows = computed<Record<string, unknown>[]>(() => {

@@ -1,6 +1,6 @@
 export interface DocumentPageProps {
-  columnsJson: string
-  rowsJson: string
+  fieldAlias: string
+  dataTable: string
   docIdsJson?: string
   project?: string
   classId?: string
