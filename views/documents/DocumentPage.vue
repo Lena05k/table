@@ -1,87 +1,77 @@
 <template>
-  <div v-if="isUnknown" class="tw-flex tw-items-center tw-justify-center tw-h-64 tw-text-gray-500 tw-text-sm">
-    Неизвестный тип ДО: <code class="tw-ml-2 tw-font-mono tw-text-red-500">{{ configId }}</code>
-  </div>
-
-  <div v-else class="tw-h-screen tw-overflow-hidden tw-bg-gray-100 tw-flex tw-justify-center">
+  <div class="tw-h-screen tw-overflow-hidden tw-bg-gray-100 tw-flex tw-justify-center">
     <div class="tw-w-full tw-max-w-[1700px] tw-h-full tw-bg-white tw-shadow-sm tw-flex tw-flex-col tw-text-gray-900">
+
       <!-- Title + global search -->
       <DocumentHeader
-        :title="config.title"
+        :title="props.title ?? ''"
         @search="onSearch"
         @favorite="() => {}"
       />
 
-      <!-- Table / Kanban tabs + download -->
-      <DocumentViewTabs
-        :tabs="config.availableTabs"
-        :active-tab="activeTab"
-        @change="setTab"
-        @download="table.exportToCsv()"
-      />
-
-      <!-- Single action+filter row: [Create][Export][Import][★][↻][...] ··· [Filters][Date][Role][Configure] -->
-      <div class="tw-flex tw-items-center tw-justify-between tw-px-5 tw-py-2.5 tw-gap-4 tw-border-b tw-border-gray-200 tw-bg-white tw-shrink-0">
-        <DocumentToolbar
-          :actions="config.toolbar"
-          @action="onToolbarAction"
-        />
-        <DocumentFilterBar
-          :filters-state="filters"
-          @apply="onFiltersApplied"
-          @open-filter-panel="() => {}"
-          @configure-columns="table.openColumnPanel()"
-        />
-      </div>
-
-      <!-- Optional stats row: operations dropdown + stage counts + special blocks -->
-      <DocumentStatsRow
-        :operations="config.operations"
-        :stats-blocks="config.statsBlocks"
-        :special-blocks="config.specialBlocks"
-        :stage-counts="{}"
-        @operate="() => {}"
-      />
-
-      <!-- Pagination hint message when on first page with many results -->
-      <div
-        v-if="pagination.page.value === 1 && pagination.total.value > pagination.pageSize.value"
-        class="tw-px-5 tw-py-2 tw-text-xs tw-text-gray-500 tw-bg-blue-50 tw-border-b tw-border-blue-100 tw-shrink-0"
-      >
-        Показаны первые {{ pagination.pageSize.value }} документов. Чтобы сократить выборку, воспользуйтесь поиском.
-      </div>
-
-      <!-- Kanban placeholder -->
-      <div
-        v-if="activeTab === 'kanban'"
-        class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-text-gray-400 tw-text-sm"
-      >
-        Канбан-вид в разработке
-      </div>
-
-      <!-- AG-Grid table — flex-1 min-h-0 so it fills remaining space and scrolls internally -->
-      <template v-if="activeTab === 'table'">
-        <div class="tw-flex-1 tw-min-h-0 tw-overflow-hidden">
-          <DocumentTable
-            :column-defs="config.columns"
-            :row-data="rows"
-            :loading="loading"
-            :selection-mode="table.selectionMode.value"
-            :row-class-rules="config.rowClassRules"
-            @grid-ready="table.onGridReady"
-            @sort-changed="onSortChanged"
-            @row-clicked="onRowClicked"
-            @column-state-changed="table.saveColumnState()"
-            @view="onView"
-            @enable-select="onEnableSelect"
-            @edit="onEdit"
-            @delete="onDelete"
-          />
+      <!-- Sub-header: record count + action buttons -->
+      <div class="tw-flex tw-items-center tw-justify-between tw-px-5 tw-py-2 tw-border-b tw-border-gray-200 tw-bg-white tw-shrink-0">
+        <span class="tw-text-xs tw-text-gray-500">
+          {{ countLabel }}
+        </span>
+        <div class="tw-flex tw-items-center tw-gap-1">
+          <button
+            class="tw-p-1.5 tw-rounded hover:tw-bg-gray-100 tw-text-gray-500 hover:tw-text-gray-700 tw-transition-colors"
+            title="Экспорт CSV"
+            @click="table.exportToCsv()"
+          >
+            <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </button>
+          <button
+            class="tw-p-1.5 tw-rounded hover:tw-bg-gray-100 tw-text-gray-500 hover:tw-text-gray-700 tw-transition-colors"
+            title="Настройка колонок"
+            @click="table.openColumnPanel()"
+          >
+            <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15M3 9h18M3 15h18" />
+            </svg>
+          </button>
         </div>
+      </div>
 
-        <!-- Pagination bar -->
-        <DocumentPagination :pagination-state="pagination" />
-      </template>
+      <!-- Empty states -->
+      <div
+        v-if="filteredRows.length === 0 && allRowData.length > 0"
+        class="tw-p-10 tw-text-center tw-text-gray-400 tw-text-sm"
+      >
+        По запросу «{{ searchQuery }}» ничего не найдено
+      </div>
+      <div
+        v-else-if="allRowData.length === 0"
+        class="tw-p-10 tw-text-center tw-text-gray-400 tw-text-sm"
+      >
+        Нет данных для отображения
+      </div>
+
+      <!-- AG-Grid table -->
+      <div v-if="allRowData.length > 0 && filteredRows.length > 0" class="tw-flex-1 tw-min-h-0 tw-overflow-hidden">
+        <DocumentTable
+          :column-defs="colDefs"
+          :row-data="pageRows"
+          :loading="false"
+          @grid-ready="table.onGridReady"
+          @sort-changed="onSortChanged"
+          @row-clicked="onRowClicked"
+          @column-state-changed="table.saveColumnState()"
+          @view="onRowClicked"
+          @enable-select="() => {}"
+          @edit="() => {}"
+          @delete="() => {}"
+        />
+      </div>
+
+      <!-- Pagination bar -->
+      <DocumentPagination
+        v-if="allRowData.length > 0"
+        :pagination-state="pagination"
+      />
 
       <!-- Column visibility slide-out panel -->
       <ColumnConfigPanel :table-state="table" />
@@ -90,77 +80,199 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { doConfigs } from './config/index'
-import { useDocumentPage } from './composables/useDocumentPage'
+import { computed, ref, watch } from 'vue'
 import DocumentHeader from './components/DocumentHeader.vue'
-import DocumentViewTabs from './components/DocumentViewTabs.vue'
-import DocumentToolbar from './components/DocumentToolbar.vue'
-import DocumentFilterBar from './components/DocumentFilterBar.vue'
-import DocumentStatsRow from './components/DocumentStatsRow.vue'
 import DocumentTable from './components/DocumentTable.vue'
 import DocumentPagination from './components/DocumentPagination.vue'
 import ColumnConfigPanel from './components/ColumnConfigPanel.vue'
+import { usePagination } from './composables/usePagination'
+import { useDocumentTable } from './composables/useDocumentTable'
+import type { ColDef } from 'ag-grid-community'
 import type { DocumentPageProps } from './types/props'
+import type { FieldDef, DataCell } from './types/widget'
 
-const props = defineProps<DocumentPageProps>()
-const route = useRoute()
-const router = useRouter()
+const props = withDefaults(defineProps<DocumentPageProps>(), {
+  docIdsJson: '[]',
+  classId: '',
+  parentDocumentId: '',
+  title: '',
+})
 
-const config = computed(() => doConfigs[props.configId])
+// ─── Utilities ────────────────────────────────────────────────────────────────
 
-// Guard: unknown DO config
-const isUnknown = computed(() => !config.value)
-
-const {
-  activeTab,
-  rows,
-  loading,
-  pagination,
-  filters,
-  table,
-  load,
-  onSortChanged,
-  onFiltersApplied,
-  setTab,
-} = useDocumentPage(config.value ?? doConfigs['do2'])
-
-function onToolbarAction(key: string): void {
-  if (key === 'refresh') { load(); return }
-  if (key === 'export') { table.exportToCsv(); return }
+function safeJson<T>(json: string, fallback: T): T {
+  try { return JSON.parse(json) } catch { return fallback }
 }
 
+// ─── Parse props ──────────────────────────────────────────────────────────────
+
+const fieldAlias = computed<Record<string, FieldDef>>(() =>
+  safeJson(props.columnsJson, {}),
+)
+
+const rawRows = computed<DataCell[][]>(() =>
+  safeJson(props.rowsJson, []),
+)
+
+const docIds = computed<string[]>(() =>
+  safeJson(props.docIdsJson ?? '[]', []),
+)
+
+// ─── Column definitions ───────────────────────────────────────────────────────
+
+const colDefs = computed<ColDef[]>(() => {
+  const entries = Object.entries(fieldAlias.value)
+  const n       = entries.length
+  const result  = new Array<ColDef>(n)
+  for (let i = 0; i < n; i++) {
+    const [sysName, field] = entries[i]
+    result[i] = {
+      colId:                    sysName,
+      field:                    sysName,
+      headerName:               field[0],
+      sortable:                 field.CAN_SORTING,
+      resizable:                true,
+      minWidth:                 80,
+      suppressHeaderMenuButton: !field.CAN_SORTING,
+    }
+  }
+  return result
+})
+
+// ─── Row data ─────────────────────────────────────────────────────────────────
+
+const allRowData = computed<Record<string, unknown>[]>(() => {
+  const raw  = rawRows.value
+  const ids  = docIds.value
+  const n    = raw.length
+  const result = new Array<Record<string, unknown>>(n)
+  for (let rowIdx = 0; rowIdx < n; rowIdx++) {
+    const cells = raw[rowIdx]
+    const cLen  = cells.length
+    const row: Record<string, unknown> = {}
+    let firstCellValue: string | null = null
+    for (let j = 0; j < cLen; j++) {
+      const cell = cells[j]
+      if (!cell?.sys_name) continue
+      const display = cell.value_title ?? cell.value ?? ''
+      row[cell.sys_name] = display
+      if (firstCellValue === null) firstCellValue = String(cell.value ?? '')
+    }
+    row['_docId']  = ids[rowIdx] ?? firstCellValue ?? ''
+    result[rowIdx] = row
+  }
+  return result
+})
+
+// ─── Search ───────────────────────────────────────────────────────────────────
+
+const searchQuery = ref('')
 let _searchTimer: ReturnType<typeof setTimeout>
+
+const searchIndex = computed<string[]>(() => {
+  const data = allRowData.value
+  const n    = data.length
+  const idx  = new Array<string>(n)
+  for (let i = 0; i < n; i++) {
+    const row  = data[i]
+    const keys = Object.keys(row)
+    const kLen = keys.length
+    let str    = ''
+    for (let j = 0; j < kLen; j++) {
+      const k = keys[j]
+      if (k.charCodeAt(0) === 95) continue // skip '_' prefix fields
+      if (str.length > 0) str += '\0'
+      const v = row[k]
+      if (v !== null && v !== undefined) str += v
+    }
+    idx[i] = str.toLowerCase()
+  }
+  return idx
+})
+
+const filteredRows = computed<Record<string, unknown>[]>(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return allRowData.value
+  const data   = allRowData.value
+  const idx    = searchIndex.value
+  const n      = data.length
+  const result: Record<string, unknown>[] = []
+  for (let i = 0; i < n; i++) {
+    if (idx[i].includes(q)) result.push(data[i])
+  }
+  return result
+})
+
 function onSearch(query: string): void {
   clearTimeout(_searchTimer)
-  filters.setFilter('_search', query)
   _searchTimer = setTimeout(() => {
+    searchQuery.value = query
     pagination.reset()
-    load()
-  }, 300)
+  }, 250)
 }
+
+// ─── Sort ─────────────────────────────────────────────────────────────────────
+
+const sortModel = ref<{ colId: string; sort: string }[]>([])
+
+const sortedRows = computed<Record<string, unknown>[]>(() => {
+  if (!sortModel.value.length) return filteredRows.value
+  const rows = filteredRows.value.slice()
+  const { colId, sort } = sortModel.value[0]
+  const dir = sort === 'asc' ? 1 : -1
+  const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true })
+  rows.sort((a, b) => dir * collator.compare(String(a[colId] ?? ''), String(b[colId] ?? '')))
+  return rows
+})
+
+function onSortChanged(model: { colId: string; sort: string }[]): void {
+  sortModel.value = model
+  pagination.reset()
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+
+const pagination = usePagination(50, [25, 50, 100, 200])
+
+watch(sortedRows, (rows) => {
+  pagination.setTotal(rows.length)
+}, { immediate: true })
+
+const pageRows = computed<Record<string, unknown>[]>(() => {
+  const from = (pagination.page.value - 1) * pagination.pageSize.value
+  const to   = from + pagination.pageSize.value
+  return sortedRows.value.slice(from, to)
+})
+
+const countLabel = computed(() => {
+  const total    = allRowData.value.length
+  const filtered = filteredRows.value.length
+  if (total === 0) return '0 записей'
+  return filtered === total
+    ? `${total} записей`
+    : `${filtered} из ${total}`
+})
+
+// ─── AG-Grid table state ──────────────────────────────────────────────────────
+
+const table = useDocumentTable(props.classId || 'doc')
+
+// ─── Row navigation ───────────────────────────────────────────────────────────
 
 function onRowClicked(data: Record<string, unknown>): void {
-  const code = data['code']
-  if (code !== undefined) {
-    router.push(`/do/${props.configId}/${code}`)
+  const docId = data['_docId']
+  if (!docId || !props.classId) return
+
+  if (props.parentDocumentId) {
+    const url = `/documents/?progectId=${props.classId}&parentDocumentId=${props.parentDocumentId}&documentId=${docId}`
+    const openWindow = (window as unknown as Record<string, unknown>)['openWindow']
+    if (typeof openWindow === 'function') {
+      ;(openWindow as (u: string, w: number, h: number) => void)(url, 1100, 710)
+    } else {
+      window.open(url, '_blank', 'width=1100,height=710')
+    }
+  } else {
+    window.location.href = `?progectId=${props.classId}&documentId=${docId}`
   }
-}
-
-function onEnableSelect(_data: Record<string, unknown>): void {
-  table.enableSelection()
-}
-
-function onView(data: Record<string, unknown>): void {
-  onRowClicked(data)
-}
-
-function onEdit(_data: Record<string, unknown>): void {
-  // TODO: open edit modal
-}
-
-function onDelete(_data: Record<string, unknown>): void {
-  // TODO: confirm + delete
 }
 </script>
