@@ -1,6 +1,8 @@
+import type { FieldDef, DataCell } from './widget'
+
 export interface DocumentPageProps {
-  fieldAlias: string
-  dataTable: string
+  fieldAlias: Record<string, FieldDef>
+  dataTable: DataCell[][]
   docIdsJson?: string
   project?: string
   classId?: string

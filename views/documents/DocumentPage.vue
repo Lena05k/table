@@ -109,13 +109,9 @@ function safeJson<T>(json: string, fallback: T): T {
 
 // ─── Parse props ──────────────────────────────────────────────────────────────
 
-const columns = computed<Record<string, FieldDef>>(() =>
-  safeJson(props.fieldAlias, {}),
-)
+const columns = computed<Record<string, FieldDef>>(() => props.fieldAlias ?? {})
 
-const rows = computed<DataCell[][]>(() =>
-  safeJson(props.dataTable, []),
-)
+const rows = computed<DataCell[][]>(() => props.dataTable ?? [])
 
 const docIds = computed<string[]>(() =>
   safeJson(props.docIdsJson ?? '[]', []),
