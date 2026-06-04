@@ -1,5 +1,5 @@
 export interface DocumentPageProps {
-  columnsJson: string
+  fieldAlias: string
   rowsJson: string
   docIdsJson?: string
   project?: string

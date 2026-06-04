@@ -84,7 +84,7 @@
             {if $documentData}
                 <vue-dp-documents-table
                     id="vue-dp-documents-table-{$classId}-{$documentData.OBJ_ID}"
-                    columns-json="{$fieldAlias|@json_encode|escape:'html'}"
+                    field-alias="{$fieldAlias|@json_encode|escape:'html'}"
                     rows-json="{$dataTable|@json_encode|escape:'html'}"
                     doc-ids-json="{$docIdsArr}"
                     class-id="{$classId}"
@@ -93,7 +93,7 @@
             {else}
                 <vue-dp-documents-table
                     id="vue-dp-documents-table-{$classId}"
-                    columns-json="{$fieldAlias|@json_encode|escape:'html'}"
+                    field-alias="{$fieldAlias|@json_encode|escape:'html'}"
                     rows-json="{$dataTable|@json_encode|escape:'html'}"
                     doc-ids-json="{$docIdsArr}"
                     class-id="{$classId}"
