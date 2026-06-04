@@ -91,7 +91,13 @@ import type { ColDef } from 'ag-grid-community'
 import type { DocumentPageProps } from './types/props'
 import type { FieldDef, DataCell } from './types/widget'
 
+function safeJson<T>(json: string, fallback: T): T {
+  try { return JSON.parse(json) } catch { return fallback }
+}
+
 const props = withDefaults(defineProps<DocumentPageProps>(), {
+  columnsJson: '{}',
+  rowsJson: '[]',
   docIdsJson: '[]',
   project: '',
   classId: '',
@@ -101,17 +107,15 @@ const props = withDefaults(defineProps<DocumentPageProps>(), {
 
 const projectId = computed(() => props.project || props.classId || '')
 
-// ─── Utilities ────────────────────────────────────────────────────────────────
-
-function safeJson<T>(json: string, fallback: T): T {
-  try { return JSON.parse(json) } catch { return fallback }
-}
-
 // ─── Parse props ──────────────────────────────────────────────────────────────
 
-const columns = computed<Record<string, FieldDef>>(() => props.fieldAlias ?? {})
+const columns = computed<Record<string, FieldDef>>(() =>
+  safeJson(props.columnsJson, {}),
+)
 
-const rows = computed<DataCell[][]>(() => props.dataTable ?? [])
+const rows = computed<DataCell[][]>(() =>
+  safeJson(props.rowsJson, []),
+)
 
 const docIds = computed<string[]>(() =>
   safeJson(props.docIdsJson ?? '[]', []),
