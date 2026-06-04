@@ -74,7 +74,6 @@ import DocumentPagination from '@/views/documents/crm/documentTables/components/
 import ColumnConfigPanel from '@/views/documents/crm/documentTables/components/ColumnConfigPanel.vue';
 import { usePagination } from '@/views/documents/crm/documentTables/composable/usePagination';
 import { useDocumentTable } from '@/views/documents/crm/documentTables/composable/useDocumentTable';
-import type { DocumentPageProps } from './types/props';
 import type { DataCell, FieldDef } from './types/widget';
 
 function safeJson<T>(json: string, fallback: T): T {
@@ -85,14 +84,14 @@ function safeJson<T>(json: string, fallback: T): T {
     }
 }
 
-const props = withDefaults(defineProps<DocumentPageProps>(), {
-    fieldAlias: '{}',
-    rowsJson: '[]',
-    docIdsJson: '[]',
-    project: '',
-    classId: '',
-    parentDocumentId: '',
-    title: ''
+const props = defineProps({
+    fieldAlias:       { type: String, default: '{}' },
+    rowsJson:         { type: String, default: '[]' },
+    docIdsJson:       { type: String, default: '[]' },
+    project:          { type: String, default: '' },
+    classId:          { type: String, default: '' },
+    parentDocumentId: { type: String, default: '' },
+    title:            { type: String, default: '' },
 });
 
 const projectId = computed(() => props.project || props.classId || '');
