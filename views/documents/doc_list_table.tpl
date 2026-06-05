@@ -83,20 +83,20 @@
             {capture assign="docIdsArr"}[{foreach from=$dataTable item=tableRow name=docIdLoop}{$tableRow.ID}{if !$smarty.foreach.docIdLoop.last},{/if}{/foreach}]{/capture}
             {if $documentData}
                 <vue-dp-documents-table
-                    id="vue-dp-documents-table-{$classId}-{$documentData.OBJ_ID}"
-                    field-alias="{$fieldAlias|@json_encode|escape:'html'}"
-                    rows-json="{$dataTable|@json_encode|escape:'html'}"
-                    doc-ids-json="{$docIdsArr}"
-                    class-id="{$classId}"
-                    parent-document-id="{$documentData.OBJ_ID}"
+                    id='vue-dp-documents-table-{$classId}-{$documentData.OBJ_ID}'
+                    field-alias='{$fieldAlias|@json_encode}'
+                    rows-json='{$dataTable|@json_encode}'
+                    doc-ids-json='{$docIdsArr}'
+                    class-id='{$classId}'
+                    parent-document-id='{$documentData.OBJ_ID}'
                 ></vue-dp-documents-table>
             {else}
                 <vue-dp-documents-table
-                    id="vue-dp-documents-table-{$classId}"
-                    field-alias="{$fieldAlias|@json_encode|escape:'html'}"
-                    rows-json="{$dataTable|@json_encode|escape:'html'}"
-                    doc-ids-json="{$docIdsArr}"
-                    class-id="{$classId}"
+                    id='vue-dp-documents-table-{$classId}'
+                    field-alias='{$fieldAlias|@json_encode}'
+                    rows-json='{$dataTable|@json_encode}'
+                    doc-ids-json='{$docIdsArr}'
+                    class-id='{$classId}'
                 ></vue-dp-documents-table>
             {/if}
             {* ── конец эксперимента ─────────────────────────────────────────── *}
