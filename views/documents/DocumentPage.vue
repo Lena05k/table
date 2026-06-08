@@ -121,14 +121,16 @@ const colDefs = computed<ColDef[]>(() => {
             suppressHeaderMenuButton: !field.CAN_SORTING
         };
     }
-    return result.filter(Boolean);
+    const cols = result.filter(Boolean);
+    console.log('[colDefs] колонок:', cols.length, '| первая:', cols[0]);
+    return cols;
 });
 
 // ─── Row data ─────────────────────────────────────────────────────────────────
 
 const allRowData = computed<Record<string, unknown>[]>(() => {
     const raw = rows.value;
-    if (!Array.isArray(raw)) return [];
+    if (!Array.isArray(raw)) { console.warn('[allRowData] raw не массив:', typeof raw); return []; }
     const ids = docIds.value;
     const n = raw.length;
     const result = new Array<Record<string, unknown>>(n);
@@ -151,6 +153,7 @@ const allRowData = computed<Record<string, unknown>[]>(() => {
         row._docId = ids[rowIdx] ?? firstCellValue ?? '';
         result[rowIdx] = row;
     }
+    console.log('[allRowData] строк:', result.length, '| row[0]:', result[0]);
     return result;
 });
 
