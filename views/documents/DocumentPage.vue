@@ -110,17 +110,18 @@ const colDefs = computed<ColDef[]>(() => {
     const result = new Array<ColDef>(n);
     for (let i = 0; i < n; i++) {
         const [sysName, field] = entries[i];
+        if (!field) continue;
         result[i] = {
             colId: sysName,
             field: sysName,
-            headerName: field[0],
-            sortable: field.CAN_SORTING,
+            headerName: field[0] ?? sysName,
+            sortable: field.CAN_SORTING ?? false,
             resizable: true,
             minWidth: 80,
             suppressHeaderMenuButton: !field.CAN_SORTING
         };
     }
-    return result;
+    return result.filter(Boolean);
 });
 
 // ─── Row data ─────────────────────────────────────────────────────────────────
