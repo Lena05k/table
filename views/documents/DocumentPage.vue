@@ -113,8 +113,8 @@ const docIds = computed<string[]>(() => {
 
 // ─── Column definitions ───────────────────────────────────────────────────────
 
-const colDefs = computed<ColDef[]>(() =>
-    Object.entries(columns.value)
+const colDefs = computed<ColDef[]>(() => {
+    const cols = Object.entries(columns.value)
         .filter(([, field]) => field != null)
         .map(([sysName, field]) => ({
             colId: sysName,
@@ -124,13 +124,17 @@ const colDefs = computed<ColDef[]>(() =>
             resizable: true,
             minWidth: 80,
             suppressHeaderMenuButton: !(field as FieldDef).CAN_SORTING,
-        }))
-);
+        }));
+    console.log('[colDefs] колонок:', cols.length, '| первая:', cols[0]);
+    return cols;
+});
 
 // ─── Row data ─────────────────────────────────────────────────────────────────
 
-const allRowData = computed<Record<string, unknown>[]>(() =>
-    rows.value.map((cells, rowIdx) => {
+const allRowData = computed<Record<string, unknown>[]>(() => {
+    console.log('[allRowData] rows длина:', rows.value.length, '| docIds длина:', docIds.value.length);
+
+    const result = rows.value.map((cells, rowIdx) => {
         const row: Record<string, unknown> = {};
         const cellsArr = Array.isArray(cells)
             ? cells
@@ -145,7 +149,19 @@ const allRowData = computed<Record<string, unknown>[]>(() =>
         }
 
         row._docId = docIds.value[rowIdx] ?? Object.values(row)[0] ?? '';
+
+        // Логируем только первую строку
+        if (rowIdx === 0) {
+            console.log('[allRowData] row[0] ячеек в cellsArr:', cellsArr.length, '| isArray:', Array.isArray(cells));
+            console.log('[allRowData] row[0] результат:', row);
+        }
+
         return row;
+    });
+
+    console.log('[allRowData] итого строк:', result.length);
+    return result;
+});
     })
 );
 
