@@ -98,89 +98,56 @@ const projectId = computed(() => props.project || props.classId || '');
 
 // ─── Parse props ──────────────────────────────────────────────────────────────
 
-const columns = computed<Record<string, FieldDef>>(() => safeJson(props.fieldAlias, {}));
-const rows = computed<DataCell[][]>(() => safeJson(props.rowsJson, []));
-const docIds = computed<string[]>(() => safeJson(props.docIdsJson ?? '[]', []));
+const columns = computed<Record<string, FieldDef>>(() => {
+    const v = safeJson(props.fieldAlias, {});
+    return v && typeof v === 'object' ? v : {};
+});
+const rows = computed<unknown[][]>(() => {
+    const v = safeJson(props.rowsJson, []);
+    return Array.isArray(v) ? v : [];
+});
+const docIds = computed<string[]>(() => {
+    const v = safeJson(props.docIdsJson ?? '[]', []);
+    return Array.isArray(v) ? v : [];
+});
 
 // ─── Column definitions ───────────────────────────────────────────────────────
 
-const colDefs = computed<ColDef[]>(() => {
-    const entries = Object.entries(columns.value);
-    const n = entries.length;
-    const result = new Array<ColDef>(n);
-    for (let i = 0; i < n; i++) {
-        const [sysName, field] = entries[i];
-        if (!field) continue;
-        result[i] = {
+const colDefs = computed<ColDef[]>(() =>
+    Object.entries(columns.value)
+        .filter(([, field]) => field != null)
+        .map(([sysName, field]) => ({
             colId: sysName,
             field: sysName,
-            headerName: field[0] ?? sysName,
-            sortable: field.CAN_SORTING ?? false,
+            headerName: (field as FieldDef)[0] ?? sysName,
+            sortable: (field as FieldDef).CAN_SORTING ?? false,
             resizable: true,
             minWidth: 80,
-            suppressHeaderMenuButton: !field.CAN_SORTING
-        };
-    }
-    const cols = result.filter(Boolean);
-    console.log('[colDefs] колонок:', cols.length, '| первая:', cols[0]);
-    return cols;
-});
+            suppressHeaderMenuButton: !(field as FieldDef).CAN_SORTING,
+        }))
+);
 
 // ─── Row data ─────────────────────────────────────────────────────────────────
 
-const allRowData = computed<Record<string, unknown>[]>(() => {
-    const raw = rows.value;
-    console.log('[allRowData] raw isArray:', Array.isArray(raw), '| длина:', raw?.length);
-    if (!Array.isArray(raw)) { console.warn('[allRowData] raw не массив:', typeof raw); return []; }
-
-    const ids = docIds.value;
-    console.log('[allRowData] docIds длина:', ids.length);
-
-    const n = raw.length;
-    const result = new Array<Record<string, unknown>>(n);
-
-    for (let rowIdx = 0; rowIdx < n; rowIdx++) {
-        const cells = raw[rowIdx];
+const allRowData = computed<Record<string, unknown>[]>(() =>
+    rows.value.map((cells, rowIdx) => {
         const row: Record<string, unknown> = {};
-        let firstCellValue: string | null = null;
+        const cellsArr = Array.isArray(cells)
+            ? cells
+            : Object.values(cells && typeof cells === 'object' ? cells as Record<string, unknown> : {});
 
-        if (!cells || typeof cells !== 'object') {
-            console.warn('[allRowData] row[' + rowIdx + '] пропущен — не объект:', cells);
-            result[rowIdx] = row;
-            continue;
-        }
-
-        const cellsArr: unknown[] = Array.isArray(cells) ? cells : Object.values(cells as Record<string, unknown>);
-
-        // Логируем только первую строку чтобы не спамить
-        if (rowIdx === 0) {
-            console.log('[allRowData] row[0] isArray:', Array.isArray(cells), '| ячеек:', cellsArr.length);
-            console.log('[allRowData] row[0] cell[0]:', cellsArr[0]);
-        }
-
-        for (let j = 0; j < cellsArr.length; j++) {
-            const cell = cellsArr[j] as Record<string, unknown> | null;
-            if (!cell) continue;
-            const key = (cell.sys_name as string) || (cell.id ? `FIELD_${cell.id}` : null);
-
-            // Логируем каждую ячейку только для первой строки
-            if (rowIdx === 0) {
-                console.log(`[allRowData] cell[${j}] sys_name="${cell.sys_name}" id="${cell.id}" → key="${key}" value="${cell.value}"`);
-            }
-
+        for (const rawCell of cellsArr) {
+            const cell = rawCell as Record<string, unknown>;
+            if (!cell || typeof cell !== 'object') continue;
+            const key = (cell.sys_name as string) || (cell.id ? `FIELD_${cell.id}` : '');
             if (!key) continue;
-            const display = (cell.value_title ?? cell.value ?? '') as string;
-            row[key] = display;
-            if (firstCellValue === null) firstCellValue = String(cell.value ?? '');
+            row[key] = cell.value_title ?? cell.value ?? '';
         }
 
-        row._docId = ids[rowIdx] ?? firstCellValue ?? '';
-        result[rowIdx] = row;
-    }
-
-    console.log('[allRowData] итого строк:', result.length, '| row[0]:', result[0]);
-    return result;
-});
+        row._docId = docIds.value[rowIdx] ?? Object.values(row)[0] ?? '';
+        return row;
+    })
+);
 
 // ─── Search ───────────────────────────────────────────────────────────────────
 
