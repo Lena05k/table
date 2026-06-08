@@ -137,6 +137,7 @@ const allRowData = computed<Record<string, unknown>[]>(() => {
         const row: Record<string, unknown> = {};
         let firstCellValue: string | null = null;
         // PHP может отдать строку как объект {"0":{...},"1":{...}} вместо массива
+        if (!cells || typeof cells !== 'object') { result[rowIdx] = row; continue; }
         const cellsArr: unknown[] = Array.isArray(cells) ? cells : Object.values(cells as Record<string, unknown>);
         for (let j = 0; j < cellsArr.length; j++) {
             const cell = cellsArr[j] as Record<string, unknown> | null;
