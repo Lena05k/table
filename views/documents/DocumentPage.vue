@@ -130,30 +130,55 @@ const colDefs = computed<ColDef[]>(() => {
 
 const allRowData = computed<Record<string, unknown>[]>(() => {
     const raw = rows.value;
+    console.log('[allRowData] raw isArray:', Array.isArray(raw), '| длина:', raw?.length);
     if (!Array.isArray(raw)) { console.warn('[allRowData] raw не массив:', typeof raw); return []; }
+
     const ids = docIds.value;
+    console.log('[allRowData] docIds длина:', ids.length);
+
     const n = raw.length;
     const result = new Array<Record<string, unknown>>(n);
+
     for (let rowIdx = 0; rowIdx < n; rowIdx++) {
         const cells = raw[rowIdx];
         const row: Record<string, unknown> = {};
         let firstCellValue: string | null = null;
-        // PHP может отдать строку как объект {"0":{...},"1":{...}} вместо массива
-        if (!cells || typeof cells !== 'object') { result[rowIdx] = row; continue; }
+
+        if (!cells || typeof cells !== 'object') {
+            console.warn('[allRowData] row[' + rowIdx + '] пропущен — не объект:', cells);
+            result[rowIdx] = row;
+            continue;
+        }
+
         const cellsArr: unknown[] = Array.isArray(cells) ? cells : Object.values(cells as Record<string, unknown>);
+
+        // Логируем только первую строку чтобы не спамить
+        if (rowIdx === 0) {
+            console.log('[allRowData] row[0] isArray:', Array.isArray(cells), '| ячеек:', cellsArr.length);
+            console.log('[allRowData] row[0] cell[0]:', cellsArr[0]);
+        }
+
         for (let j = 0; j < cellsArr.length; j++) {
             const cell = cellsArr[j] as Record<string, unknown> | null;
             if (!cell) continue;
             const key = (cell.sys_name as string) || (cell.id ? `FIELD_${cell.id}` : null);
+
+            // Логируем каждую ячейку только для первой строки
+            if (rowIdx === 0) {
+                console.log(`[allRowData] cell[${j}] sys_name="${cell.sys_name}" id="${cell.id}" → key="${key}" value="${cell.value}"`);
+            }
+
             if (!key) continue;
             const display = (cell.value_title ?? cell.value ?? '') as string;
             row[key] = display;
             if (firstCellValue === null) firstCellValue = String(cell.value ?? '');
         }
+
         row._docId = ids[rowIdx] ?? firstCellValue ?? '';
         result[rowIdx] = row;
     }
-    console.log('[allRowData] строк:', result.length, '| row[0]:', result[0]);
+
+    console.log('[allRowData] итого строк:', result.length, '| row[0]:', result[0]);
     return result;
 });
 
