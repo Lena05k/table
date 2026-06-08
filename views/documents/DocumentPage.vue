@@ -127,21 +127,25 @@ const colDefs = computed<ColDef[]>(() => {
 
 const allRowData = computed<Record<string, unknown>[]>(() => {
     const raw = rows.value;
+    if (!Array.isArray(raw)) return [];
     const ids = docIds.value;
     const n = raw.length;
     const result = new Array<Record<string, unknown>>(n);
     for (let rowIdx = 0; rowIdx < n; rowIdx++) {
         const cells = raw[rowIdx];
-        const cLen = cells.length;
         const row: Record<string, unknown> = {};
         let firstCellValue: string | null = null;
-        for (let j = 0; j < cLen; j++) {
-            const cell = cells[j];
-            const key = cell?.sys_name ?? (cell?.id ? `FIELD_${cell.id}` : null);
-            if (!key) continue;
-            const display = cell.value_title ?? cell.value ?? '';
-            row[key] = display;
-            if (firstCellValue === null) firstCellValue = String(cell.value ?? '');
+        if (Array.isArray(cells)) {
+            for (let j = 0; j < cells.length; j++) {
+                const cell = cells[j];
+                if (!cell) continue;
+                // sys_name из PHP или FIELD_{id} как запасной вариант
+                const key = cell.sys_name || (cell.id ? `FIELD_${cell.id}` : null);
+                if (!key) continue;
+                const display = cell.value_title ?? cell.value ?? '';
+                row[key] = display;
+                if (firstCellValue === null) firstCellValue = String(cell.value ?? '');
+            }
         }
         row._docId = ids[rowIdx] ?? firstCellValue ?? '';
         result[rowIdx] = row;
