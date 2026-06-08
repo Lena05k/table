@@ -137,9 +137,10 @@ const allRowData = computed<Record<string, unknown>[]>(() => {
         let firstCellValue: string | null = null;
         for (let j = 0; j < cLen; j++) {
             const cell = cells[j];
-            if (!cell?.sys_name) continue;
+            const key = cell?.sys_name ?? (cell?.id ? `FIELD_${cell.id}` : null);
+            if (!key) continue;
             const display = cell.value_title ?? cell.value ?? '';
-            row[cell.sys_name] = display;
+            row[key] = display;
             if (firstCellValue === null) firstCellValue = String(cell.value ?? '');
         }
         row._docId = ids[rowIdx] ?? firstCellValue ?? '';
