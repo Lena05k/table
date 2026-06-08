@@ -127,9 +127,20 @@ const colDefs = computed<ColDef[]>(() => {
 
 const allRowData = computed<Record<string, unknown>[]>(() => {
     const raw = rows.value;
+    console.log('[allRowData] raw тип:', typeof raw, 'isArray:', Array.isArray(raw), 'длина:', (raw as unknown[])?.length);
     if (!Array.isArray(raw)) return [];
     const ids = docIds.value;
     const n = raw.length;
+    if (n === 0) { console.log('[allRowData] rows пустой'); return []; }
+
+    // Диагностика первой строки
+    const firstRow = raw[0];
+    console.log('[allRowData] row[0] тип:', typeof firstRow, 'isArray:', Array.isArray(firstRow), 'значение:', firstRow);
+    if (Array.isArray(firstRow) && firstRow.length > 0) {
+        console.log('[allRowData] cell[0]:', firstRow[0]);
+        console.log('[allRowData] sys_name:', firstRow[0]?.sys_name, '| id:', firstRow[0]?.id);
+    }
+
     const result = new Array<Record<string, unknown>>(n);
     for (let rowIdx = 0; rowIdx < n; rowIdx++) {
         const cells = raw[rowIdx];
@@ -139,7 +150,6 @@ const allRowData = computed<Record<string, unknown>[]>(() => {
             for (let j = 0; j < cells.length; j++) {
                 const cell = cells[j];
                 if (!cell) continue;
-                // sys_name из PHP или FIELD_{id} как запасной вариант
                 const key = cell.sys_name || (cell.id ? `FIELD_${cell.id}` : null);
                 if (!key) continue;
                 const display = cell.value_title ?? cell.value ?? '';
@@ -150,6 +160,7 @@ const allRowData = computed<Record<string, unknown>[]>(() => {
         row._docId = ids[rowIdx] ?? firstCellValue ?? '';
         result[rowIdx] = row;
     }
+    console.log('[allRowData] результат row[0]:', result[0]);
     return result;
 });
 
