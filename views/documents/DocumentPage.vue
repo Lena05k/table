@@ -70,6 +70,7 @@ import DocumentTable from './components/DocumentTable.vue';
 import DocumentPagination from './components/DocumentPagination.vue';
 import DocumentToolbar from './components/DocumentToolbar.vue';
 import DocumentStatsRow from './components/DocumentStatsRow.vue';
+import ActionsCellRenderer from './components/ActionsCellRenderer.vue';
 import ColumnConfigPanel from './components/ColumnConfigPanel.vue';
 import { usePagination } from './composables/usePagination';
 import { useDocumentTable } from './composables/useDocumentTable';
@@ -140,8 +141,20 @@ const colDefs = computed<ColDef[]>(() => {
             minWidth: 80,
             suppressHeaderMenuButton: !(field as FieldDef).CAN_SORTING,
         }));
-    console.log('[colDefs] колонок:', cols.length, '| первая:', cols[0]);
-    return cols;
+    const actionsCol: ColDef = {
+        colId: 'actions',
+        field: 'actions',
+        headerName: 'Действия',
+        width: 90,
+        pinned: 'right',
+        sortable: false,
+        resizable: false,
+        suppressMovable: true,
+        suppressHeaderMenuButton: true,
+        cellRenderer: ActionsCellRenderer,
+    };
+    console.log('[colDefs] колонок:', cols.length + 1, '| первая:', cols[0]);
+    return [...cols, actionsCol];
 });
 
 // ─── Row data ─────────────────────────────────────────────────────────────────
