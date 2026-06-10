@@ -268,7 +268,28 @@ const table = useDocumentTable(projectId.value || 'doc');
 // ─── Toolbar ─────────────────────────────────────────────────────────────────
 
 function onToolbarAction(key: string): void {
-    console.log('[toolbar] action:', key);
+    switch (key) {
+        case 'export':
+            table.exportToCsv();
+            break;
+        case 'refresh':
+            table.refreshCells();
+            break;
+        case 'columns':
+            table.openColumnPanel();
+            break;
+        case 'reset-columns':
+            table.resetColumnState();
+            break;
+        case 'select':
+            table.enableSelection();
+            break;
+        case 'create':
+            window.location.href = `?progectId=${projectId.value}&action=create`;
+            break;
+        default:
+            console.log('[toolbar] action не обработан:', key);
+    }
 }
 
 // ─── Row navigation ───────────────────────────────────────────────────────────
