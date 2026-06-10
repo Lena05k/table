@@ -1,34 +1,30 @@
 <template>
     <div class="tw-h-screen tw-overflow-hidden tw-bg-gray-100 tw-flex tw-justify-center">
         <div class="tw-w-full tw-max-w-[1700px] tw-h-full tw-bg-white tw-shadow-sm tw-flex tw-flex-col tw-text-gray-900">
+
             <!-- Title + global search -->
             <DocumentHeader :title="props.title ?? ''" @search="onSearch" @favorite="() => {}" />
 
-            <!-- Sub-header: record count + action buttons -->
+            <!-- Toolbar: action buttons -->
+            <div v-if="toolbarActions.length" class="tw-flex tw-items-center tw-px-5 tw-py-2 tw-border-b tw-border-gray-200 tw-bg-white tw-shrink-0">
+                <DocumentToolbar :actions="toolbarActions" @action="onToolbarAction" />
+            </div>
+
+            <!-- Stats + operations row -->
+            <DocumentStatsRow v-if="statsBlocks.length || operations.length" :stats-blocks="statsBlocks" :operations="operations" />
+
+            <!-- Sub-header: record count + column settings -->
             <div class="tw-flex tw-items-center tw-justify-between tw-px-5 tw-py-2 tw-border-b tw-border-gray-200 tw-bg-white tw-shrink-0">
-                <span class="tw-text-xs tw-text-gray-500">
-                    {{ countLabel }}
-                </span>
-                <div class="tw-flex tw-items-center tw-gap-1">
-                    <button
-                        class="tw-p-1.5 tw-rounded hover:tw-bg-gray-100 tw-text-gray-500 hover:tw-text-gray-700 tw-transition-colors"
-                        title="Экспорт CSV"
-                        @click="table.exportToCsv()"
-                    >
-                        <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
-                    </button>
-                    <button
-                        class="tw-p-1.5 tw-rounded hover:tw-bg-gray-100 tw-text-gray-500 hover:tw-text-gray-700 tw-transition-colors"
-                        title="Настройка колонок"
-                        @click="table.openColumnPanel()"
-                    >
-                        <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15M3 9h18M3 15h18" />
-                        </svg>
-                    </button>
-                </div>
+                <span class="tw-text-xs tw-text-gray-500">{{ countLabel }}</span>
+                <button
+                    class="tw-p-1.5 tw-rounded hover:tw-bg-gray-100 tw-text-gray-500 hover:tw-text-gray-700 tw-transition-colors"
+                    title="Настройка колонок"
+                    @click="table.openColumnPanel()"
+                >
+                    <svg class="tw-w-4 tw-h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15M3 9h18M3 15h18" />
+                    </svg>
+                </button>
             </div>
 
             <!-- Empty states -->
@@ -68,13 +64,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import type { ColDef } from 'ag-grid-community';
-import DocumentHeader from '@/views/documents/crm/documentTables/components/DocumentHeader.vue';
-import DocumentTable from '@/views/documents/crm/documentTables/components/DocumentTable.vue';
-import DocumentPagination from '@/views/documents/crm/documentTables/components/DocumentPagination.vue';
-import ColumnConfigPanel from '@/views/documents/crm/documentTables/components/ColumnConfigPanel.vue';
-import { usePagination } from '@/views/documents/crm/documentTables/composable/usePagination';
-import { useDocumentTable } from '@/views/documents/crm/documentTables/composable/useDocumentTable';
-import type { DataCell, FieldDef } from './types/widget';
+import DocumentHeader from './components/DocumentHeader.vue';
+import DocumentTable from './components/DocumentTable.vue';
+import DocumentPagination from './components/DocumentPagination.vue';
+import DocumentToolbar from './components/DocumentToolbar.vue';
+import DocumentStatsRow from './components/DocumentStatsRow.vue';
+import ColumnConfigPanel from './components/ColumnConfigPanel.vue';
+import { usePagination } from './composables/usePagination';
+import { useDocumentTable } from './composables/useDocumentTable';
+import type { FieldDef } from './types/widget';
+import type { ToolbarAction, StatsBlockConfig, OperationConfig } from './config/types';
 
 function safeJson<T>(json: string, fallback: T): T {
     try {
@@ -88,6 +87,9 @@ const props = defineProps({
     fieldAlias:       { type: String, default: '{}' },
     rowsJson:         { type: String, default: '[]' },
     docIdsJson:       { type: String, default: '[]' },
+    toolbarJson:      { type: String, default: '[]' },
+    statsBlocksJson:  { type: String, default: '[]' },
+    operationsJson:   { type: String, default: '[]' },
     project:          { type: String, default: '' },
     classId:          { type: String, default: '' },
     parentDocumentId: { type: String, default: '' },
@@ -108,6 +110,18 @@ const rows = computed<unknown[][]>(() => {
 });
 const docIds = computed<string[]>(() => {
     const v = safeJson(props.docIdsJson ?? '[]', []);
+    return Array.isArray(v) ? v : [];
+});
+const toolbarActions = computed<ToolbarAction[]>(() => {
+    const v = safeJson(props.toolbarJson, []);
+    return Array.isArray(v) ? v : [];
+});
+const statsBlocks = computed<StatsBlockConfig[]>(() => {
+    const v = safeJson(props.statsBlocksJson, []);
+    return Array.isArray(v) ? v : [];
+});
+const operations = computed<OperationConfig[]>(() => {
+    const v = safeJson(props.operationsJson, []);
     return Array.isArray(v) ? v : [];
 });
 
@@ -150,7 +164,6 @@ const allRowData = computed<Record<string, unknown>[]>(() => {
 
         row._docId = docIds.value[rowIdx] ?? Object.values(row)[0] ?? '';
 
-        // Логируем только первую строку
         if (rowIdx === 0) {
             console.log('[allRowData] row[0] ячеек в cellsArr:', cellsArr.length, '| isArray:', Array.isArray(cells));
             console.log('[allRowData] row[0] результат:', row);
@@ -162,8 +175,6 @@ const allRowData = computed<Record<string, unknown>[]>(() => {
     console.log('[allRowData] итого строк:', result.length);
     return result;
 });
-    })
-);
 
 // ─── Search ───────────────────────────────────────────────────────────────────
 
@@ -253,6 +264,12 @@ const countLabel = computed(() => {
 // ─── AG-Grid table state ──────────────────────────────────────────────────────
 
 const table = useDocumentTable(projectId.value || 'doc');
+
+// ─── Toolbar ─────────────────────────────────────────────────────────────────
+
+function onToolbarAction(key: string): void {
+    console.log('[toolbar] action:', key);
+}
 
 // ─── Row navigation ───────────────────────────────────────────────────────────
 

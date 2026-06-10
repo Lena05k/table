@@ -45,6 +45,9 @@ function configToProps(route: RouteLocationNormalized): Record<string, unknown> 
     fieldAlias: JSON.stringify(fieldAlias),
     rowsJson: JSON.stringify(rowsArr),
     docIdsJson: JSON.stringify(docIds),
+    toolbarJson: JSON.stringify(cfg.toolbar ?? []),
+    statsBlocksJson: JSON.stringify(cfg.statsBlocks ?? []),
+    operationsJson: JSON.stringify(cfg.operations ?? []),
   }
 }
 
