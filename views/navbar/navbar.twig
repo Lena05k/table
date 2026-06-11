@@ -1,0 +1,31 @@
+{#
+  Шапка страницы — Vue custom element.
+
+  Переменные (передаёт PHP-контроллер):
+    navbarUserJson  — JSON строка вида {"fio":"Иванов Иван","initials":"ИИ"}
+    navbarMenuJson  — JSON строка с массивом пунктов меню (см. ниже)
+    navbarLogoHref  — URL для логотипа (по умолчанию "/")
+
+  Пример navbarMenuJson:
+    [
+      {"key":"doc","label":"Документооборот","children":[
+        {"key":"doc-list","label":"Список ДО","href":"/documents/"},
+        {"key":"doc-archive","label":"Архив","href":"/documents/archive/"}
+      ]},
+      {"key":"reports","label":"Отчеты","children":[
+        {"key":"reports-all","label":"Все отчёты","href":"/reports/"}
+      ]},
+      {"key":"history","label":"История","href":"/history/"},
+      {"key":"management","label":"Управление","children":[
+        {"key":"mgmt-users","label":"Пользователи","href":"/management/users/"}
+      ]},
+      {"key":"console","label":"Консоль","href":"/console/"},
+      {"key":"actions","label":"Быстрые действия","href":"/quick-actions/"}
+    ]
+#}
+
+<vue-app-navbar
+    user-json='{{ navbarUserJson|default('{"fio":"","initials":""}') }}'
+    menu-json='{{ navbarMenuJson|default('[]') }}'
+    logo-href="{{ navbarLogoHref|default('/') }}"
+></vue-app-navbar>

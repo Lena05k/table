@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
 import DocumentPage from '@/views/documents/DocumentPage.vue'
+import AppNavbar from '@/views/navbar/AppNavbar.vue'
 import { doConfigs } from '@/views/documents/config'
 import { mockData } from '@/views/documents/config/mockData'
 
@@ -51,10 +52,29 @@ function configToProps(route: RouteLocationNormalized): Record<string, unknown> 
   }
 }
 
+const MOCK_MENU = JSON.stringify([
+  { key: 'doc', label: 'Документооборот', children: [
+    { key: 'do2', label: 'Убытки КАСКО', href: '/do/do2' },
+    { key: 'do1', label: 'Убытки ДО', href: '/do/do1' },
+  ]},
+  { key: 'reports',    label: 'Отчеты',          children: [{ key: 'r1', label: 'Все отчёты', href: '#' }] },
+  { key: 'history',    label: 'История',          href: '#' },
+  { key: 'management', label: 'Управление',       children: [{ key: 'm1', label: 'Пользователи', href: '#' }] },
+  { key: 'console',    label: 'Консоль',          href: '#' },
+  { key: 'actions',    label: 'Быстрые действия', href: '#' },
+])
+const MOCK_USER = JSON.stringify({ fio: 'Круподерова Елена Вадимовна', initials: 'КЕ' })
+
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: '/do/do2',
+  },
+  {
+    path: '/navbar',
+    name: 'navbar-preview',
+    component: AppNavbar,
+    props: { menuJson: MOCK_MENU, userJson: MOCK_USER },
   },
   {
     path: '/do/:configId',
