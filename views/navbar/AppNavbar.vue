@@ -1,5 +1,5 @@
 <template>
-  <nav class="tw-bg-primary-600 tw-flex tw-items-center tw-h-12 tw-px-4 tw-gap-3 tw-shrink-0 tw-w-full">
+  <nav class="tw-bg-primary-600 tw-flex tw-items-center tw-h-12 tw-px-4 tw-gap-3 tw-shrink-0 tw-w-full tw-sticky tw-top-0 tw-z-[1000]">
 
     <!-- Logo -->
     <NavLogo :href="logoHref || '/'" />
