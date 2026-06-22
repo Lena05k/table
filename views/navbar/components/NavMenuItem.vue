@@ -38,7 +38,7 @@
     >
       <div
         v-if="open"
-        class="tw-absolute tw-top-full tw-left-0 tw-mt-1 tw-bg-white tw-rounded-lg tw-shadow-xl tw-z-[9999] tw-min-w-[180px] tw-py-1 tw-border tw-border-gray-100 tw-origin-top-left tw-max-h-[calc(100vh-60px)] tw-overflow-y-auto"
+        class="tw-absolute tw-top-full tw-left-0 tw-mt-1 tw-bg-white tw-rounded-lg tw-shadow-xl tw-z-[9999] tw-min-w-[180px] tw-py-1 tw-border tw-border-gray-100 tw-origin-top-left tw-max-h-72 tw-overflow-y-auto"
       >
         <slot name="dropdown" />
       </div>
